@@ -1,5 +1,11 @@
 import type { LoginInput } from '~/schemas/auth.schema'
-import type { AuthResponse, SocialAuthResponse, GoogleRedirectResponse } from '~/types/auth'
+import type {
+  AuthResponse,
+  AdminAuthResponse,
+  RegisterInput,
+  GoogleRedirectResponse,
+  GithubRedirectResponse,
+} from '~/types/auth'
 
 export const useAuthService = () => {
   const api = useApiClient()
@@ -20,7 +26,7 @@ export const useAuthService = () => {
 
   const register = async (userData: RegisterInput): Promise<AuthResponse> => {
     const endpoint = `/auth/register/${userData.role}`
-    
+
     const basePayload: Record<string, unknown> = {
       full_name: userData.full_name,
       email: userData.email,
@@ -35,12 +41,14 @@ export const useAuthService = () => {
       basePayload.skills = userData.skills || []
       basePayload.github_link = userData.github_link || null
       basePayload.bio = userData.bio
-    } else if (userData.role === 'supervisor') {
+    }
+    else if (userData.role === 'supervisor') {
       basePayload.academic_title = userData.academic_title
       basePayload.specialization = userData.specialization
       basePayload.office_hours = userData.office_hours
       basePayload.bio = userData.bio
-    } else if (userData.role === 'committee-member') {
+    }
+    else if (userData.role === 'committee-member') {
       basePayload.academic_title = userData.academic_title
       basePayload.specialization = userData.specialization
       basePayload.bio = userData.bio
@@ -54,7 +62,7 @@ export const useAuthService = () => {
 
   const getSkills = async (): Promise<string[]> => {
     return await api.request<string[]>('/skills', {
-      method: 'GET'
+      method: 'GET',
     })
   }
 
@@ -65,13 +73,16 @@ export const useAuthService = () => {
     })
   }
 
-  const verifyGoogleCallback = async (code: string, role?: string): Promise<SocialAuthResponse> => {
-    return await api.request<SocialAuthResponse>('/auth/google/callback', {
+  const getGithubRedirect = async (role: string = 'student'): Promise<GithubRedirectResponse> => {
+    return await api.request<GithubRedirectResponse>('/auth/github/redirect', {
       method: 'GET',
-      params: {
-        code,
-        ...(role && { role }),
-      },
+      params: { role },
+    })
+  }
+
+  const getMe = async (): Promise<MeResponse> => {
+    return await api.request<MeResponse>('/auth/me', {
+      method: 'GET',
     })
   }
 
@@ -81,6 +92,7 @@ export const useAuthService = () => {
     register,
     getSkills,
     getGoogleRedirect,
-    verifyGoogleCallback,
+    getGithubRedirect,
+    getMe
   }
 }
