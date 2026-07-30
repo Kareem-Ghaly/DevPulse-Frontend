@@ -1,4 +1,3 @@
-// ~/schemas/auth.schema.ts
 import { z } from 'zod'
 
 export const LoginSchema = z.object({
