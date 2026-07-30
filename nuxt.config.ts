@@ -12,6 +12,21 @@ export default defineNuxtConfig({
     }
   },
 
+  runtimeConfig: {
+    public: {
+      pusherKey: process.env.NUXT_PUBLIC_PUSHER_KEY,
+      pusherCluster: process.env.NUXT_PUBLIC_PUSHER_CLUSTER,
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://127.0.0.1:8000/api',
+      firebaseApiKey: '',
+      firebaseAuthDomain: '',
+      firebaseProjectId: '',
+      firebaseStorageBucket: '',
+      firebaseMessagingSenderId: '',
+      firebaseAppId: '',
+      firebaseVapidKey: '',
+    },
+  },
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
@@ -48,6 +63,12 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    devProxy: {
+      '/broadcasting': {
+        target: 'http://127.0.0.1:8000/broadcasting',
+        changeOrigin: true,
+      },
+    },
     preset: 'cloudflare-pages',
     prerender: {
       crawlLinks: true,
