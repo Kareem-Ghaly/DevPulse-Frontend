@@ -5,16 +5,17 @@ import { useMutation } from '@tanstack/vue-query'
 import { LoginSchema, type LoginInput } from '../../schemas/auth.schema'
 
 definePageMeta({
-  layout: 'blank'
+  layout: 'blank',
 })
 
 const authService = useAuthService()
 const authStore = useAuthStore()
 const appToast = useAppToast()
 const isGoogleLoading = ref(false)
+const isGithubLoading = ref(false)
 
 const { handleSubmit, errors, defineField } = useForm<LoginInput>({
-  validationSchema: toTypedSchema(LoginSchema)
+  validationSchema: toTypedSchema(LoginSchema),
 })
 
 const [email, emailAttrs] = defineField('email')
@@ -29,19 +30,24 @@ const { mutate: executeLogin, isPending: isLoading } = useMutation({
       authStore.setAuth({
         token: responseData.data.token,
         user: responseData.data.user,
-        role: responseData.data.role
+        role: responseData.data.role,
       })
+      const { requestPermission, listenToMessages } = useFirebaseMessaging()
+      await requestPermission()
+      listenToMessages()
       const userName = responseData.data.user.name || 'User'
-      
+
       appToast.success('Welcome back!', `Successfully signed in as ${userName}`)
+
       const userRole = responseData.data.user.role
       if (userRole === 'Student' || userRole === 'student') {
         await navigateTo('/student/my-projects')
-      } else {
+      }
+      else {
         await navigateTo('/')
       }
     }
-  }
+  },
 })
 
 const onSubmit = handleSubmit((values) => {
@@ -49,6 +55,7 @@ const onSubmit = handleSubmit((values) => {
 })
 
 const selectedRole = ref('student')
+
 const handleGoogleLogin = async () => {
   isGoogleLoading.value = true
   try {
@@ -56,21 +63,36 @@ const handleGoogleLogin = async () => {
     if (response && response.status && response.data.redirect_url) {
       window.location.href = response.data.redirect_url
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error)
     appToast.error('Google Login Error', 'Could not initialize Google authentication. Please try again.')
-  } finally {
+  }
+  finally {
     isGoogleLoading.value = false
   }
 }
 
-const handleGithubLogin = () => {
-  appToast.warning('Coming Soon', 'GitHub authentication is currently being prepared by the backend team.')
+const handleGithubLogin = async () => {
+  isGithubLoading.value = true
+  try {
+    const response = await authService.getGithubRedirect(selectedRole.value)
+    if (response && response.status && response.data.redirect_url) {
+      window.location.href = response.data.redirect_url
+    }
+  }
+  catch (error) {
+    console.error(error)
+    appToast.error('GitHub Login Error', 'Could not initialize GitHub authentication. Please try again.')
+  }
+  finally {
+    isGithubLoading.value = false
+  }
 }
 
 const inputUiConfig = {
   root: 'rounded-lg',
-  base: 'bg-input-bg border-input-border text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm py-2.5 px-3'
+  base: 'bg-input-bg border-input-border text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm py-2.5 px-3',
 }
 </script>
 
@@ -147,8 +169,16 @@ const inputUiConfig = {
           </div>
 
           <div class="grid grid-cols-2 gap-3 mb-6">
-            <button type="button" class="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border-slate bg-panel-dark text-xs font-semibold text-slate-200 hover:bg-[#121d42] transition-colors cursor-pointer" @click="handleGithubLogin">
-              <UIcon name="i-heroicons-globe-alt" class="h-4 w-4 text-slate-400" />
+            <button
+              type="button"
+              :disabled="isGithubLoading"
+              class="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border-slate bg-panel-dark text-xs font-semibold text-slate-200 hover:bg-[#121d42] transition-colors cursor-pointer disabled:opacity-50"
+              @click="handleGithubLogin"
+            >
+              <UIcon
+                :name="isGithubLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-globe-alt'"
+                :class="['h-4 w-4 text-slate-400', isGithubLoading && 'animate-spin']"
+              />
               GitHub
             </button>
             <button type="button" :disabled="isGoogleLoading" class="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border-slate bg-panel-dark text-xs font-semibold text-slate-200 hover:bg-[#121d42] transition-colors cursor-pointer disabled:opacity-50" @click="handleGoogleLogin">
