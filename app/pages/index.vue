@@ -233,7 +233,7 @@ const scrollToSection = (id: string) => {
     </header>
 
     <main>
-      <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section class="relative min-h-screen sm:mt-0 mt-20 flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 bg-brand-bg">
           <canvas ref="canvasRef" class="absolute inset-0 w-full h-full opacity-60"/>
           
@@ -381,7 +381,7 @@ const scrollToSection = (id: string) => {
                     <UIcon name="i-heroicons-sparkles" class="h-4 w-4 text-emerald-400" />
                   </div>
                   <div>
-                    <div class="text-xs font-semibold text-white">AI Report</div>
+                    <div class="text-xs font-semibold text-white">Kanban Board</div>
                     <div class="text-[10px] text-slate-400">Generated</div>
                   </div>
                 </div>
