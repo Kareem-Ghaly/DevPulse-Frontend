@@ -1,4 +1,4 @@
-export interface ProjectOwner {
+export interface interfaceProjectOwner  {
   id: number
   name: string
   username: string | null
@@ -26,10 +26,9 @@ export interface ProjectIdea {
   domain: string | null
   team_size: number
   status: string
-  is_public: number
   created_at: string
   updated_at: string
-  owner: ProjectOwner
+  owner: interfaceProjectOwner
 }
 
 export interface ProjectIdeaPayload {
@@ -56,51 +55,18 @@ export interface MyProjectsResponse {
   }
 }
 
-export interface SingleProjectResponse {
-  status: boolean
-  message: string
-  data: {
-    project_idea: ProjectIdea
-  }
-}
-
-export interface ProjectProposal {
-  id: number
-  project_team_id: number | null
-  created_by: number | null
-  last_updated_by: number | null
-  title: string
-  problem: string | null
-  problem_overview: string | null
-  comparison_table_with_similar_applications: string | null
-  project_users: string | null
-  mind_map_problem: string | null
-  mind_map_problem_url: string | null
-  solution_overview: string | null
-  proposed_solution: string | null
-  mind_map_solution: string | null
-  mind_map_solution_url: string | null
-  functional_requirements: string | null
-  non_functional_requirements: string | null
-  project_management: string | null
-  programming_languages: string | null
-  supervisor: string | null
-  project_teams: string | null
-  status: string
-  last_update: string | null
-  created_at: string
-  updated_at: string
-}
-
 export interface ProposalPayload {
   title: string
+  problem?: string
   problem_overview?: string
   comparison_table_with_similar_applications?: string
   project_users?: string
   mind_map_problem?: File | null
+  mind_map_problem_url?: File | null
   solution_overview?: string
   proposed_solution?: string
   mind_map_solution?: File | null
+  mind_map_solution_url?: File | null
   functional_requirements?: string
   non_functional_requirements?: string
   project_management?: string
@@ -110,41 +76,10 @@ export interface ProposalPayload {
   status?: string
 }
 
-export interface ProposalResponse {
-  status: boolean
-  message: string
-  data: {
-    proposal: ProjectProposal
-  }
-}
-
-export interface TeamMemberProfile {
-  full_name: string
-  university_id: string
-  department: string
-  academic_year: string
-  skills: string[]
-  bio: string
-}
-
-export interface TeamMember {
-  id: number
-  name: string
-  email: string
-  role: string
-  profile: TeamMemberProfile
-}
-
 export interface ProjectTeam {
   id: number
   status: string
   members: TeamMember[]
-}
-
-export interface Student {
-  id: number
-  name: string
-  email: string
 }
 
 export interface Match {
@@ -162,28 +97,42 @@ export interface MatchesResponse {
   }
 }
 
-export interface InvitationPayload {
-  receiver_id: number
+export interface User {
+  id: number
+  name: string
+  email: string
+  status: string
+  profile_completed: boolean
 }
 
-export interface InvitationResponse {
+export interface SingleProjectResponse {
   status: boolean
   message: string
   data: {
-    invitation: {
-      id: number
-      receiver_id: number
-      status: string
-    }
+    project_idea: ProjectIdea
   }
 }
 
-export interface InvitationsListResponse {
+export interface MyProjectsResponse {
   status: boolean
+  message: string
   data: {
-    invitations: {
-      receiver_id: number
-      project_idea_id: number
-    }[]
+    projects: ProjectIdea[]
+  }
+}
+
+export interface ProjectIdeaPayload {
+  title: string
+  abstract: string
+  description: string
+  team_size: number
+  required_skills: string[]
+}
+
+export interface ProjectIdeaResponse {
+  status: boolean
+  message: string
+  data: {
+    project_idea: ProjectIdea
   }
 }
