@@ -1,123 +1,106 @@
 <script setup lang="ts">
-import { useMutation } from '@tanstack/vue-query'
+import type { UserProfile } from '~/types/auth'
 
 definePageMeta({
-  layout: 'blank'
+  layout: 'blank',
 })
 
 const route = useRoute()
 const authStore = useAuthStore()
-const authService = useAuthService()
 const appToast = useAppToast()
 
-const showRoleSelection = ref(false)
-const selectedRole = ref<string | null>(null)
-const codeParam = computed(() => (route.query.code as string) || '')
+const isProcessing = ref(true)
+const errorMessage = ref('')
 
-const { mutate: executeSocialAuth, isPending } = useMutation({
-  mutationFn: async (roleValue?: string) => {
-    return await authService.verifyGoogleCallback(codeParam.value, roleValue)
-  },
-  onSuccess: async (response) => {
-    if (response?.status && response.data) {
-      authStore.setAuth({
-        token: response.data.token,
-        user: response.data.user,
-        role: response.data.role
-      })
+const processAuthCallback = async () => {
+  try {
+    const token = route.query.token as string | undefined
+    const userJson = route.query.user as string | undefined
+    const role = route.query.role as string | undefined
+    const profileCompletedRaw = route.query.profile_completed as string | undefined
 
-      appToast.success('Welcome to DevPulse!', `Logged in successfully as ${response.data.user.name}`)
+    if (!token || !userJson) {
+      errorMessage.value = 'Invalid authentication response. Missing required data.'
 
-      if (response.data.profile_completed === false) {
-        // await navigateTo('/profile/setup')
-      } else {
+      return
+    }
+
+    let user: UserProfile
+    try {
+      user = JSON.parse(decodeURIComponent(userJson)) as UserProfile
+    }
+    catch {
+      errorMessage.value = 'Failed to parse user data from authentication response.'
+      
+      return
+    }
+
+    const profileCompleted = profileCompletedRaw === '1' || profileCompletedRaw === 'true'
+
+    authStore.setAuth({
+      token,
+      user,
+      role: role || user.role || 'student',
+    })
+
+    appToast.success('Welcome to DevPulse!', `Logged in successfully as ${user.name}`)
+
+    if (!profileCompleted) {
+      await navigateTo('/profile/setup')
+    }
+    else {
+      const userRole = role || user.role
+      if (userRole?.toLowerCase() === 'student') {
+        await navigateTo('/student/my-projects')
+      }
+      else {
         await navigateTo('/')
       }
     }
-  },
-  onError: (error: unknown) => {
-    const fetchError = error as { data?: { status: boolean; errors?: { role?: string[] } } }
-    const errorData = fetchError.data
+  }
+  catch (error) {
+    console.error('Auth callback error:', error)
+    errorMessage.value = 'An unexpected error occurred during authentication.'
+  }
+  finally {
+    isProcessing.value = false
+  }
+}
 
-    if (errorData && errorData.status === false && errorData.errors?.role) {
-      showRoleSelection.value = true
-      appToast.warning('Role Required', 'Please select your role to complete your registration.')
-    } else {
-      console.error(error)
-      appToast.error('Authentication Failed', 'An error occurred during verification.')
-      navigateTo('/auth/login')
-    }
+onMounted(() => {
+  if (import.meta.client) {
+    processAuthCallback()
   }
 })
-
-if (import.meta.client) {
-  if (codeParam.value) {
-    executeSocialAuth(undefined)
-  } else {
-    navigateTo('/auth/login')
-  }
-}
-
-const handleRoleSubmit = () => {
-  if (!selectedRole.value) {
-    appToast.error('Selection Missing', 'Please select a role.')
-    
-return
-  }
-  showRoleSelection.value = false
-  executeSocialAuth(selectedRole.value)
-}
 </script>
 
 <template>
   <div class="min-h-screen bg-brand-deep flex items-center justify-center text-white font-sans antialiased">
-    
-    <div v-if="isPending" class="w-full max-w-md text-center space-y-6 p-8 rounded-xl border border-border-dark bg-brand-dark">
-      <div class="h-12 w-12 rounded-full border-4 border-t-brand-purple border-input-border animate-spin mx-auto"/>
-      <p class="text-xs text-slate-400 animate-pulse">Securing your session and verifying credentials...</p>
+    <div v-if="isProcessing" class="w-full max-w-md text-center space-y-6 p-8 rounded-xl border border-border-dark bg-brand-dark">
+      <div class="h-12 w-12 rounded-full border-4 border-t-brand-purple border-input-border animate-spin mx-auto" />
+      <p class="text-xs text-slate-400 animate-pulse">
+        Securing your session and verifying credentials...
+      </p>
     </div>
 
-    <div v-else-if="showRoleSelection" class="w-full max-w-lg p-8 rounded-xl border border-border-dark bg-brand-dark shadow-2xl space-y-6">
-      <div class="text-center space-y-2">
-        <h3 class="text-xl font-bold text-white tracking-tight">Complete Your Profile</h3>
-        <p class="text-xs text-slate-400">Select your academic role before continuing registration via Google</p>
+    <div v-else-if="errorMessage" class="w-full max-w-md text-center space-y-6 p-8 rounded-xl border border-border-dark bg-brand-dark">
+      <div class="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto">
+        <UIcon name="i-heroicons-x-mark" class="h-6 w-6 text-rose-500" />
       </div>
-
-      <div class="grid grid-cols-3 gap-3">
-        <button 
-          type="button"
-          :class="['p-4 rounded-lg border text-center transition-all cursor-pointer space-y-2', selectedRole === 'student' ? 'border-brand-purple bg-[#121833]' : 'border-border-slate bg-panel-dark hover:border-slate-700']"
-          @click="selectedRole = 'student'"
-        >
-          <UIcon name="i-heroicons-academic-cap" class="h-6 w-6 mx-auto text-blue-400" />
-          <div class="text-xs font-semibold">Student</div>
-        </button>
-
-        <button 
-          type="button"
-          :class="['p-4 rounded-lg border text-center transition-all cursor-pointer space-y-2', selectedRole === 'supervisor' ? 'border-brand-purple bg-[#121833]' : 'border-border-slate bg-panel-dark hover:border-slate-700']"
-          @click="selectedRole = 'supervisor'"
-        >
-          <UIcon name="i-heroicons-user" class="h-6 w-6 mx-auto text-emerald-400" />
-          <div class="text-xs font-semibold">Supervisor</div>
-        </button>
-
-        <button 
-          type="button"
-          :class="['p-4 rounded-lg border text-center transition-all cursor-pointer space-y-2', selectedRole === 'committee-member' ? 'border-brand-purple bg-[#121833]' : 'border-border-slate bg-panel-dark hover:border-slate-700']"
-          @click="selectedRole = 'committee-member'"
-        >
-          <UIcon name="i-heroicons-shield-check" class="h-6 w-6 mx-auto text-purple-400" />
-          <div class="text-xs font-semibold">Committee</div>
-        </button>
+      <div class="space-y-2">
+        <h3 class="text-lg font-bold text-white">
+          Authentication Failed
+        </h3>
+        <p class="text-xs text-slate-400">
+          {{ errorMessage }}
+        </p>
       </div>
-
-      <UButton 
+      <UButton
         block
         size="lg"
-        label="Confirm & Create Account"
+        label="Back to Login"
         class="bg-brand-purple hover:bg-brand-purple-hover font-semibold text-sm transition-colors cursor-pointer"
-        @click="handleRoleSubmit"
+        @click="navigateTo('/auth/login')"
       />
     </div>
   </div>
