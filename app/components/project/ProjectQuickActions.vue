@@ -5,6 +5,7 @@ interface Props {
   isTeamComplete: boolean
   projectId: number
   ownerId: number
+  teamId: number
 }
 
 const props = defineProps<Props>()
@@ -41,7 +42,7 @@ const handleDelete = (): void => {
     deleteProject()
   }
 }
-
+const goToMeeting = () => router.push(`/student/project-work-space/${props.teamId}/meetings`)
 const goToProposal = () => router.push(`/student/project-work-space/${props.projectId}/proposal`)
 const goToTeamBuilder = () => router.push(`/student/team-builder/${props.projectId}`)
 const goToKanban = () => router.push(`/student/project-work-space/${props.projectId}/proposal`)
@@ -75,6 +76,13 @@ const goToKanban = () => router.push(`/student/project-work-space/${props.projec
       >
         <UIcon name="i-heroicons-view-columns" class="h-4 w-4 text-emerald-400" />
         Kanban Board
+      </button>
+      <button
+        class="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-dark border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10 transition-all cursor-pointer"
+        @click="goToMeeting"
+      >
+        <UIcon name="i-heroicons-video-camera" class="h-4 w-4 text-blue-400" />
+        Meeting Scheduling
       </button>
       <button
         class="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-dark border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:border-emerald-500 hover:bg-emerald-500/10 transition-all cursor-pointer"
