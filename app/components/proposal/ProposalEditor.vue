@@ -245,16 +245,6 @@ const clearMindMapSolution = (): void => {
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Supervisor</label>
-        <input
-          v-model="form.supervisor"
-          type="text"
-          placeholder="Dr. ..."
-          class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors"
-        >
-      </div>
-
-      <div class="mb-8">
         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project Team Members</label>
         <textarea
           v-model="form.project_teams"
