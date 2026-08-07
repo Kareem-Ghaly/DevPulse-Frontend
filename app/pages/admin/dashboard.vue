@@ -7,6 +7,7 @@ const queryClient = useQueryClient()
 const appToast = useAppToast()
 const api = useApiClient()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const showLogoutModal = ref(false)
 
@@ -186,9 +187,8 @@ const getActionMenuItems = (user: UserProfile) => [
 const avatarMenuItems = [
   [
     {
-      label: 'Profile',
+      label: `${authStore.user?.email}`,
       icon: 'i-heroicons-user-circle',
-      onSelect: () => router.push('/'),
     },
   ],
   [
