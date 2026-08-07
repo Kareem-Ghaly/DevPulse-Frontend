@@ -7,6 +7,8 @@ export const RegisterSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   password_confirmation: z.string(),
 
+  research_interests: z.array(z.string()).optional().default([]),
+
   full_name: z.string().min(3, 'Full name is required'),
   department: z.string().min(2, 'Department is required'),
   university_id: z.string()

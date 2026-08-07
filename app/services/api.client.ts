@@ -27,9 +27,9 @@ export const useApiClient = () => {
         if (response.status === 403) {
           appToast.warning('Your Account is Under Review', errorMessage)
         }
-        else {
-          appToast.error('Server Error', errorMessage)
-        }
+        // else {
+        //   appToast.error('Server Error', errorMessage)
+        // }
 
         throw new Error(errorMessage)
       }

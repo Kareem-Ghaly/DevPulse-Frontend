@@ -4,19 +4,19 @@ import type { UserProfile } from '~/types/auth'
 export const useAuthStore = defineStore('auth', () => {
   const cookieOptions = {
     maxAge: 60 * 60 * 24 * 7,
-    watch: true,
     path: '/'
   }
 
   const token = useCookie<string | null>('devpulse_vault_token', cookieOptions)
-  const role = useCookie<string | null>('devpulse_vault_role', cookieOptions)
-  const user = useCookie<UserProfile | null>('devpulse_vault_user', cookieOptions)
+  
+  const user = useState<UserProfile | null>('auth_user', () => null)
+  const role = useState<string | null>('auth_role', () => null)
 
   const isAuthenticated = computed(() => !!token.value)
 
   const setAuth = (authData: { token: string; user: UserProfile; role: string }) => {
     token.value = authData.token
-    role.value = authData.role || null
+    role.value = authData.role || authData.user?.role || null
     user.value = authData.user
   }
 

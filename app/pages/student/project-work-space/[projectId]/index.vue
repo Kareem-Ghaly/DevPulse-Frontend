@@ -54,6 +54,7 @@ const goToKanban = () => router.push(`/student/project-work-space/${projectId.va
               :owner-id="project.owner_id"
               :is-team-complete="isTeamComplete"
               :project-id="projectId"
+              :teamId="team.id"
             />
             <ProjectTeamProgress
               :current-members="team.members.length"

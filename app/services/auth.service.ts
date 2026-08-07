@@ -47,6 +47,7 @@ export const useAuthService = () => {
       basePayload.specialization = userData.specialization
       basePayload.office_hours = userData.office_hours
       basePayload.bio = userData.bio
+      basePayload.research_interests = userData.research_interests || []
     }
     else if (userData.role === 'committee-member') {
       basePayload.academic_title = userData.academic_title

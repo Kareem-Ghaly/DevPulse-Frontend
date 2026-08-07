@@ -123,12 +123,16 @@ const goToSupervisorMatching = (): void => {
   }
   router.push(`/student/project-work-space/${projectId.value}/supervisors`)
 }
+
+const goToFinalSubmission = (): void => {
+  router.push(`/student/project-work-space/${projectId.value}/final-submission`)
+}
 </script>
 
 <template>
   <div class="min-h-screen text-slate-100 font-sans antialiased flex">
     <main class="flex-1  flex flex-col min-h-screen">
-      <WorkspaceHeader :subtitle="project?.title || 'Loading...'">
+      <WorkspaceHeader title="" :subtitle="project?.title || 'Loading...'">
         <div class="flex items-center gap-3">
           <div v-if="isCollaborating" class="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1">
             <div class="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -168,12 +172,17 @@ const goToSupervisorMatching = (): void => {
             <UIcon name="i-heroicons-share" class="h-3.5 w-3.5" />
             Share
           </button>
+
+          <button class="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-border-dark hover:border-slate-600 flex items-center gap-1" @click="goToFinalSubmission">
+            Final Submission
+          </button>
           
           <button class="flex items-center gap-1.5 bg-brand-purple hover:bg-brand-purple-hover text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors" :disabled="isSaving" @click="saveAsDraft">
             <UIcon v-if="isSaving" name="i-heroicons-arrow-path" class="h-3.5 w-3.5 animate-spin" />
             <UIcon v-else name="i-heroicons-check" class="h-3.5 w-3.5" />
             {{ isSaving ? 'Saving...' : 'Save' }}
           </button>
+
         </div>
       </WorkspaceHeader>
 
