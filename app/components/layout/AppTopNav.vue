@@ -57,6 +57,14 @@ onMounted(() => {
           >
             Invitations
           </NuxtLink>
+          <NuxtLink
+            to="/student/announcements"
+            class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all"
+            active-class="text-white bg-slate-800/50"
+          >
+            Announcements
+          </NuxtLink>
+          
         </div>
 
         <div class="flex items-center gap-3">
