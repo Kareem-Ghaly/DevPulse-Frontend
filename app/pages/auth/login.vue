@@ -4,13 +4,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useMutation } from '@tanstack/vue-query'
 import { LoginSchema, type LoginInput } from '../../schemas/auth.schema'
 
-definePageMeta({
-  layout: 'blank',
-})
-
 const authService = useAuthService()
 const authStore = useAuthStore()
 const appToast = useAppToast()
+const router = useRouter()
+
 const isGoogleLoading = ref(false)
 const isGithubLoading = ref(false)
 
@@ -21,30 +19,47 @@ const { handleSubmit, errors, defineField } = useForm<LoginInput>({
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 
+const { requestPermission, listenToMessages } = useFirebaseMessaging()
+
 const { mutate: executeLogin, isPending: isLoading } = useMutation({
   mutationFn: async (values: LoginInput) => {
     return await authService.login(values)
   },
   onSuccess: async (responseData) => {
     if (responseData && responseData.status && responseData.data) {
+      const user = responseData.data.user
+      
       authStore.setAuth({
         token: responseData.data.token,
-        user: responseData.data.user,
-        role: responseData.data.role,
+        user: user,
+        role: user.role,
       })
-      const { requestPermission, listenToMessages } = useFirebaseMessaging()
+      
       await requestPermission()
       listenToMessages()
-      const userName = responseData.data.user.name || 'User'
-
+      
+      const userName = user.name || 'User'
       appToast.success('Welcome back!', `Successfully signed in as ${userName}`)
 
-      const userRole = responseData.data.user.role
+      const userRole = user.role
+      const profileCompleted = user.profile_completed
+
+      console.log('User Role:', userRole)
+      console.log('Profile Completed:', profileCompleted)
+
       if (userRole === 'Student' || userRole === 'student') {
-        await navigateTo('/student/my-projects')
+        await router.push('/student/my-projects')
+      }
+      else if (userRole === 'Supervisor' || userRole === 'supervisor') {
+        if (profileCompleted === false) {
+          await router.push('/profile/supervisor/complete')
+        }
+        else {
+          await router.push('/supervisor/home')
+        }
       }
       else {
-        await navigateTo('/')
+        await router.push('/')
       }
     }
   },
@@ -162,7 +177,6 @@ const inputUiConfig = {
         </div>
 
         <div class="border border-border-dark bg-brand-dark p-8 rounded-xl shadow-xl text-left">
-          
           <div class="space-y-2 mb-6">
             <h3 class="text-lg font-bold text-white">Sign in</h3>
             <p class="text-xs text-slate-400">Choose your preferred authentication method</p>
