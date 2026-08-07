@@ -292,29 +292,31 @@ export function useTaskBoard(projectTeamId: ComputedRef<number | null>) {
   },
 })
 
-  const { mutate: completeTaskMutation, isPending: isCompleting } = useMutation({
-    mutationFn: (payload: CompleteTaskMutationPayload) => {
-      const formData = new FormData()
-      formData.append('status', payload.data.status)
-      if (payload.data.notes) formData.append('notes', payload.data.notes)
-      if (payload.data.link_url) formData.append('link_url', payload.data.link_url)
-      if (payload.data.files) {
-        payload.data.files.forEach((file) => formData.append('files[]', file))
-      }
+ const { mutate: completeTaskMutation, isPending: isCompleting } = useMutation({
+  mutationFn: (payload: CompleteTaskMutationPayload) => {
+    const formData = new FormData()
+    formData.append('_method', 'PATCH')
 
-      return api.request<ApiResponse<Task>>(`/tasks/${payload.taskId}/status`, {
-        method: 'POST',
-        body: formData,
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectTeamId] })
-      appToast.success('Success', 'Task status updated')
-    },
-    onError: (error: Error) => {
-      appToast.error('Error', error.message || 'Failed to update status')
-    },
-  })
+    formData.append('status', payload.data.status)
+    if (payload.data.notes) formData.append('notes', payload.data.notes)
+    if (payload.data.link_url) formData.append('link_url', payload.data.link_url)
+    if (payload.data.files) {
+      payload.data.files.forEach((file) => formData.append('files[]', file))
+    }
+
+    return api.request<ApiResponse<Task>>(`/tasks/${payload.taskId}/status`, {
+      method: 'POST',
+      body: formData,
+    })
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['tasks', projectTeamId] })
+    appToast.success('Success', 'Task status updated')
+  },
+  onError: (error: Error) => {
+    appToast.error('Error', error.message || 'Failed to update status')
+  },
+})
 
   const { mutate: deleteTaskMutation } = useMutation({
     mutationFn: (taskId: number) =>

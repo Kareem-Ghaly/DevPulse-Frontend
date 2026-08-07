@@ -30,7 +30,7 @@ export function useTaskStatus(projectTeamId: ComputedRef<number>) {
       }
 
       return api.request<Task>(`/tasks/${taskId}/status`, {
-        method: 'POST',
+        method: 'PATCH',
         body: fd,
       })
     },
