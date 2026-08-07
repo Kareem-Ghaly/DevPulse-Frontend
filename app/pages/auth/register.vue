@@ -30,7 +30,8 @@ const { handleSubmit, errors, defineField, values, validateField } = useForm<Reg
     role: 'student',
     academic_year: '1',
     skills: [],
-    github_link: ''
+    github_link: '',
+    research_interests: [],
   }
 })
 
@@ -46,12 +47,15 @@ const [academicTitle, academicTitleAttrs] = defineField('academic_title')
 const [specialization, specializationAttrs] = defineField('specialization')
 const [officeHours, officeHoursAttrs] = defineField('office_hours')
 const [skillsField] = defineField('skills')
+const researchInterestsRef = ref<string[]>([])
 const [githubLink, githubLinkAttrs] = defineField('github_link')
 const [bio, bioAttrs] = defineField('bio')
 
 const addCustomSkill = (): void => {
   const trimmed = customSkill.value.trim()
-  if (!trimmed) return
+  if (!trimmed) {
+    return
+  }
 
   const existingSkill = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
   
@@ -90,7 +94,7 @@ const { mutate: executeRegister, isPending: isLoading } = useMutation({
 })
 
 const submitRegistrationForm = (formValues: RegisterInput): void => {
-  const payload: RegisterInput = {
+  const payload = {
     role: formValues.role,
     email: formValues.email,
     password: formValues.password,
@@ -101,30 +105,38 @@ const submitRegistrationForm = (formValues: RegisterInput): void => {
     
     university_id: formValues.university_id,
     academic_year: formValues.academic_year,
-    skills: formValues.skills || [],
+    skills: [...(formValues.skills || [])],
     github_link: formValues.github_link || '',
     academic_title: formValues.academic_title,
     specialization: formValues.specialization,
     office_hours: formValues.office_hours,
+    research_interests: [...researchInterestsRef.value],
   }
 
   if (formValues.role === 'supervisor') {
     payload.academic_title = formValues.academic_title || 'Doctor'
     payload.specialization = formValues.specialization || ''
     payload.office_hours = formValues.office_hours || ''
-  } else if (formValues.role === 'committee-member') {
+    payload.research_interests = [...researchInterestsRef.value]
+    payload.bio = formValues.bio || ''
+  }
+  else if (formValues.role === 'committee-member') {
     payload.academic_title = formValues.academic_title || 'Doctor'
     payload.specialization = formValues.specialization || ''
   }
 
-  executeRegister(payload)
+  const cleanPayload = JSON.parse(JSON.stringify(payload))
+  executeRegister(cleanPayload)
 }
 
 const nextStep = async () => {
   if (currentStep.value === 1) {
-    if (!values.role) return
+    if (!values.role) {
+      return
+    }
     currentStep.value++
-  } else if (currentStep.value === 2) {
+  }
+  else if (currentStep.value === 2) {
     const emailRes = await validateField('email')
     const passRes = await validateField('password')
     const confRes = await validateField('password_confirmation')
@@ -132,7 +144,8 @@ const nextStep = async () => {
     if ((emailRes.valid && passRes.valid && confRes.valid) || (!errors.value.email && !errors.value.password && !errors.value.password_confirmation)) {
       currentStep.value++
     }
-  } else if (currentStep.value === 3) {
+  }
+  else if (currentStep.value === 3) {
     const nameRes = await validateField('full_name')
     const deptRes = await validateField('department')
     
@@ -143,7 +156,8 @@ const nextStep = async () => {
       if (isStep3BasicValid && (univRes.valid || !errors.value.university_id)) {
         currentStep.value++
       }
-    } else {
+    }
+    else {
       if (isStep3BasicValid) {
         submitRegistrationForm(values)
       }
@@ -152,7 +166,9 @@ const nextStep = async () => {
 }
 
 const prevStep = () => {
-  if (currentStep.value > 1) currentStep.value--
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
 }
 
 const onSubmit = handleSubmit((finalValues) => {
@@ -308,9 +324,17 @@ const uiSelectStyle = {
             </div>
             <div class="space-y-4">
               <div class="space-y-1.5">
-                <label class="block text-xs font-bold text-slate-300">Full Name</label>
-                <UInput v-model="fullName" class="w-full pt-2" v-bind="fullNameAttrs" type="text" placeholder="Enter full name" :ui="uiInputStyle" />
-                <span v-if="errors.full_name" class="text-xs text-rose-500 block mt-1">{{ errors.full_name }}</span>
+                <div :class="['space-y-1.5', role === 'supervisor' ? 'grid grid-cols-2 gap-4' : '']">
+                  <div class="">
+                    <label class="block text-xs font-bold text-slate-300">Full Name</label>
+                    <UInput v-model="fullName" class="w-full pt-2" v-bind="fullNameAttrs" type="text" placeholder="Enter full name" :ui="uiInputStyle" />
+                    <span v-if="errors.full_name" class="text-xs text-rose-500 block mt-1">{{ errors.full_name }}</span>
+                  </div>
+                  <div v-if="role === 'supervisor'">
+                    <label class="block text-xs font-bold text-slate-300">Office Hours</label>
+                    <UInput class="pt-2" v-model="officeHours" v-bind="officeHoursAttrs" type="text" placeholder="e.g. Sun 10:00 AM" :ui="uiInputStyle" />
+                  </div>
+                </div>
               </div>
 
               <div v-if="role === 'student'" class="grid grid-cols-2 gap-4">
@@ -341,8 +365,21 @@ const uiSelectStyle = {
               </div>
 
               <div v-if="role === 'supervisor'" class="space-y-1.5">
-                <label class="block text-xs font-bold text-slate-300">Office Hours</label>
-                <UInput v-model="officeHours" v-bind="officeHoursAttrs" type="text" placeholder="e.g. Sun 10:00 AM" :ui="uiInputStyle" />
+                <label class="block text-xs font-bold text-slate-300">Research Interests</label>
+                <USelectMenu
+                  v-model="researchInterestsRef"
+                  :items="localSkillsList"
+                  multiple
+                  searchable
+                  placeholder="Select research interests..."
+                  class="w-full"
+                  :ui-menu="{ 
+                    background: 'bg-brand-dark', 
+                    border: 'border border-border-dark', 
+                    option: { text: 'text-white active:bg-blue-600 font-medium' },
+                    input: 'bg-brand-deep border-border-dark text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500'
+                  }"
+                />
               </div>
 
               <div class="space-y-1.5">
