@@ -56,7 +56,6 @@ withDefaults(defineProps<Props>(), {
       </button>
     </nav>
 
-    <!-- User -->
     <div v-if="showUser" class="border-t border-border-dark pt-3 mt-auto">
       <div class="flex items-center gap-2 px-2 pt-3">
         <div class="h-8 w-8 md:h-7 md:w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
