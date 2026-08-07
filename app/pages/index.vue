@@ -217,7 +217,7 @@ const scrollToSection = (id: string) => {
 
         <div class="flex items-center gap-3">
           <button 
-            class="hidden sm:block text-sm text-slate-400 hover:text-white transition-colors px-4 py-2"
+            class="hidden hover:cursor-pointer sm:block text-sm text-slate-400 hover:text-white transition-colors px-4 py-2"
             @click="showAccountModal = true"
           >
             Sign in
