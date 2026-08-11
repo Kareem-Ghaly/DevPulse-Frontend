@@ -21,8 +21,14 @@ const form = reactive({
 onMounted(fetchMeetings)
 
 const handleSchedule = async () => {
-  await scheduleMeeting({ ...form })
+  const payload = {
+    ...form,
+    scheduled_at: new Date(form.scheduled_at).toISOString()
+  }
+
+  await scheduleMeeting(payload)
   showScheduleForm.value = false
+  
   form.title = ''
   form.description = ''
   form.scheduled_at = ''
@@ -49,17 +55,15 @@ const canJoinMeeting = (meeting: any): boolean => {
   const now = new Date()
   const meetingTime = new Date(meeting.scheduled_at)
 
-  const isToday = now.getDate() === meetingTime.getDate()
-    && now.getMonth() === meetingTime.getMonth()
-    && now.getFullYear() === meetingTime.getFullYear()
-
+  const isToday = now.toDateString() === meetingTime.toDateString()
   if (!isToday) {
     return false
   }
 
-  const fiveMinutesBefore = new Date(meetingTime.getTime() - 5 * 60 * 1000)
+  const fiveMinutesBefore = meetingTime.getTime() - 5 * 60 * 1000
+  const nowTime = now.getTime()
 
-  return now >= fiveMinutesBefore
+  return nowTime >= fiveMinutesBefore
 }
 
 const getJoinButtonText = (meeting: any): string => {
@@ -70,19 +74,17 @@ const getJoinButtonText = (meeting: any): string => {
   const now = new Date()
   const meetingTime = new Date(meeting.scheduled_at)
 
-  const isToday = now.getDate() === meetingTime.getDate()
-    && now.getMonth() === meetingTime.getMonth()
-    && now.getFullYear() === meetingTime.getFullYear()
-
+  const isToday = now.toDateString() === meetingTime.toDateString()
   if (!isToday) {
     const dateStr = meetingTime.toLocaleDateString()
 
     return `Available on ${dateStr}`
   }
 
-  const fiveMinutesBefore = new Date(meetingTime.getTime() - 5 * 60 * 1000)
+  const fiveMinutesBefore = meetingTime.getTime() - 5 * 60 * 1000
+  const nowTime = now.getTime()
 
-  if (now < fiveMinutesBefore) {
+  if (nowTime < fiveMinutesBefore) {
     const timeStr = meetingTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
     return `Starts at ${timeStr}`
@@ -90,6 +92,7 @@ const getJoinButtonText = (meeting: any): string => {
 
   return 'Join Meeting'
 }
+
 </script>
 
 <template>

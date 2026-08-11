@@ -35,12 +35,10 @@ const fetchProposalDetails = async () => {
     const err = error as { message?: string }
     appToast.error('Error', err.message || 'Failed to load project details')
   }
-
 }
 
 const fetchMeetings = async () => {
   if (!projectTeamId.value) return
-
 
   isLoading.value = true
   try {
@@ -72,7 +70,7 @@ const scheduleMeeting = async () => {
         project_team_id: projectTeamId.value,
         title: scheduleForm.title,
         description: scheduleForm.description,
-        scheduled_at: scheduleForm.scheduled_at,
+        scheduled_at: new Date(scheduleForm.scheduled_at).toISOString(),
         duration_minutes: scheduleForm.duration_minutes,
       },
     })
@@ -108,6 +106,52 @@ const formatDate = (date: string | null) => {
   return new Date(date).toLocaleString()
 }
 
+const canJoinMeeting = (meeting: Meeting): boolean => {
+  if (!meeting?.scheduled_at) {
+    return false
+  }
+
+  const now = new Date()
+  const meetingTime = new Date(meeting.scheduled_at)
+
+  const isToday = now.toDateString() === meetingTime.toDateString()
+  if (!isToday) {
+    return false
+  }
+
+  const fiveMinutesBefore = meetingTime.getTime() - 5 * 60 * 1000
+  const nowTime = now.getTime()
+
+  return nowTime >= fiveMinutesBefore
+}
+
+const getJoinButtonText = (meeting: Meeting): string => {
+  if (!meeting?.scheduled_at) {
+    return 'Join Meeting'
+  }
+
+  const now = new Date()
+  const meetingTime = new Date(meeting.scheduled_at)
+
+  const isToday = now.toDateString() === meetingTime.toDateString()
+  if (!isToday) {
+    const dateStr = meetingTime.toLocaleDateString()
+
+    return `Available on ${dateStr}`
+  }
+
+  const fiveMinutesBefore = meetingTime.getTime() - 5 * 60 * 1000
+  const nowTime = now.getTime()
+
+  if (nowTime < fiveMinutesBefore) {
+    const timeStr = meetingTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+    return `Starts at ${timeStr}`
+  }
+
+  return 'Join Meeting'
+}
+
 onMounted(() => {
   fetchProposalDetails()
 })
@@ -116,7 +160,6 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-brand-deep text-slate-100">
     <SupervisorNavbar />
-    <pre class="text-red-500">{{ res }}</pre>
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-3">
@@ -199,14 +242,18 @@ onMounted(() => {
           </div>
 
           <div class="flex items-center gap-2 pt-3 border-t border-border-dark">
-            <a
+            <!-- ✅ زر الانضمام مع التحقق من الوقت -->
+            <button
               v-if="meeting.meeting_link"
-              :href="meeting.meeting_link"
-              target="_blank"
-              class="flex-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold py-2 rounded-lg transition-colors text-center cursor-pointer"
+              :disabled="!canJoinMeeting(meeting)"
+              class="flex-1 text-xs font-bold py-2 rounded-lg transition-colors text-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              :class="canJoinMeeting(meeting) 
+                ? 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-400' 
+                : 'bg-slate-800 text-slate-500'"
+              @click="canJoinMeeting(meeting) ? navigateTo(meeting.meeting_link, { external: true }) : null"
             >
-              Join Meeting
-            </a>
+              {{ getJoinButtonText(meeting) }}
+            </button>
             <button
               class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 rounded-lg transition-colors cursor-pointer"
               @click="viewMeeting(meeting.id)"
@@ -261,7 +308,7 @@ onMounted(() => {
           <div>
             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Duration (minutes)</label>
             <input
-              v-model="scheduleForm.duration_minutes"
+              v-model.number="scheduleForm.duration_minutes"
               type="number"
               min="15"
               max="300"
