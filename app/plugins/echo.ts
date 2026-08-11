@@ -16,6 +16,7 @@ interface EchoPluginReturn {
 }
 
 export default defineNuxtPlugin((): EchoPluginReturn => {
+  const config = useRuntimeConfig();
   if (typeof window === 'undefined') {
     return {
       provide: {
@@ -47,7 +48,7 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
         wssPort: 8080,
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
-        authEndpoint: 'http://127.0.0.1:8000/api/broadcasting/auth',
+        authEndpoint: `${config.public.apiBase}/broadcasting/auth`,
         auth: {
           headers: {
             Authorization: authToken,

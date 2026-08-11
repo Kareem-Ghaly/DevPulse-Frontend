@@ -21,8 +21,6 @@ const initParticles = () => {
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
   }
-  resize()
-  window.addEventListener('resize', resize)
   
   particles.value = Array.from({ length: 50 }, () => ({
     x: Math.random() * canvas.width,
