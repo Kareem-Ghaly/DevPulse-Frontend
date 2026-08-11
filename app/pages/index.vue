@@ -130,11 +130,6 @@ const features = [
     icon: 'i-heroicons-users',
   },
   {
-    title: 'AI Documentation',
-    desc: 'Auto-generate academic reports from your project activity using Gemini AI.',
-    icon: 'i-heroicons-sparkles',
-  },
-  {
     title: 'Smart Team Matching',
     desc: 'Find teammates with complementary skills based on AI analysis.',
     icon: 'i-heroicons-user-plus',

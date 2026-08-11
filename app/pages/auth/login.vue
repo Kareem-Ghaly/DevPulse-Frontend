@@ -44,9 +44,6 @@ const { mutate: executeLogin, isPending: isLoading } = useMutation({
       const userRole = user.role
       const profileCompleted = user.profile_completed
 
-      console.log('User Role:', userRole)
-      console.log('Profile Completed:', profileCompleted)
-
       if (userRole === 'Student' || userRole === 'student') {
         await router.push('/student/my-projects')
       }
@@ -59,7 +56,7 @@ const { mutate: executeLogin, isPending: isLoading } = useMutation({
         }
       }
       else {
-        await router.push('/')
+        await router.push('/committee/profile')
       }
     }
   },
