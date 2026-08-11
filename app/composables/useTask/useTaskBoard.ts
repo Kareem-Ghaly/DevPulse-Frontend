@@ -422,24 +422,23 @@ export function useTaskBoard(projectTeamId: ComputedRef<number | null>) {
   }
 
   const handleWebSocketEvent = (event: WebSocketTaskEvent): void => {
-    if (!event?.action) return
-
-    const validActions = [
-      'task_created',
-      'task_updated',
-      'task_status_changed',
-      'task_completed',
-      'task_deleted',
-      'attachment_added',
-      'attachment_deleted',
-      'link_added',
-      'link_deleted',
-    ]
-
-    if (validActions.includes(event.action)) {
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectTeamId] })
+  if (!event?.action) return
+  
+  const validActions = [
+    'task_created', 'task_updated', 'task_status_changed', 'task_completed',
+    'task_deleted', 'attachment_added', 'attachment_deleted', 'link_added', 'link_deleted'
+  ]
+  
+  if (validActions.includes(event.action)) {
+    queryClient.invalidateQueries({ queryKey: ['tasks', projectTeamId] })
+    
+    if (event.action === 'task_created') {
+      appToast.success('New Task', 'A new task has been added')
+    } else if (event.action === 'task_status_changed') {
+      appToast.success('Task Moved', 'A task has been moved to another column')
     }
   }
+}
 
   const teamMembers = computed((): TeamMemberTaskBoard[] => {
     return membersData.value?.data ?? []

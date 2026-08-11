@@ -16,7 +16,6 @@ export const useFirebaseMessaging = () => {
     try {
       const permission = await Notification.requestPermission()
       if (permission !== 'granted') {
-        console.log('Notification permission denied')
 
         return null
       }
@@ -54,7 +53,7 @@ export const useFirebaseMessaging = () => {
         audio.volume = 0.5
         audio.play().catch(() => {})
       } catch (e) {
-        console.log(e)
+        // console.log(e)
       }
 
       appToast.error(

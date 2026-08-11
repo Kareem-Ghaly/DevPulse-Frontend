@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from '~/composables/useI18n.js'
+
 const props = defineProps<{
   project: ProjectIdea | null
   isSaving: boolean
@@ -9,6 +11,8 @@ const emit = defineEmits<{
   saveDraft: []
 }>()
 
+const { t, dir } = useI18n()
+
 const form = defineModel<ProposalPayload>('form', { required: true })
 const mindMapProblemPreview = defineModel<string | null>('mindMapProblemPreview', { default: null })
 const mindMapSolutionPreview = defineModel<string | null>('mindMapSolutionPreview', { default: null })
@@ -16,18 +20,17 @@ const mindMapSolutionPreview = defineModel<string | null>('mindMapSolutionPrevie
 const mindMapProblemInput = ref<HTMLInputElement | null>(null)
 const mindMapSolutionInput = ref<HTMLInputElement | null>(null)
 
-  const initializeFromProposal = (proposal: ProjectProposal | null): void => {
+const initializeFromProposal = (proposal: ProjectProposal | null): void => {
   if (!proposal) return
 
   if (!mindMapProblemPreview.value?.startsWith('blob:')) {
     mindMapProblemPreview.value = proposal.mind_map_problem_url || null
   }
-  
+
   if (!mindMapSolutionPreview.value?.startsWith('blob:')) {
     mindMapSolutionPreview.value = proposal.mind_map_solution_url || null
   }
 }
-
 
 
 defineExpose({
@@ -64,7 +67,7 @@ const clearMindMapSolution = (): void => {
 </script>
 
 <template>
-  <div class="flex-1 p-4 md:p-8 overflow-y-auto">
+  <div class="flex-1 p-4 md:p-8 overflow-y-auto" :dir="dir">
     <div class="mx-auto max-w-4xl">
       <div class="mb-6">
         <span
@@ -72,62 +75,67 @@ const clearMindMapSolution = (): void => {
           :class="form.status === 'draft' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'"
         >
           <span class="h-1.5 w-1.5 rounded-full" :class="form.status === 'draft' ? 'bg-amber-400' : 'bg-emerald-400'" />
-          {{ form.status === 'draft' ? 'DRAFT' : 'SUBMITTED' }}
+          {{ form.status === 'draft' ? t('draft') : t('submitted') }}
         </span>
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project Title</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('projectTitle') }}</label>
         <input
           v-model="form.title"
           type="text"
-          placeholder="Enter project title..."
+          :placeholder="t('enterTitle')"
           class="w-full bg-transparent text-2xl md:text-3xl font-bold text-white placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         >
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Problem</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('problem') }}</label>
         <textarea
           v-model="form.problem"
           rows="3"
-          placeholder="Describe the core problem your project addresses..."
+          :placeholder="t('describeProblem')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Problem Overview</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('problemOverview') }}</label>
         <textarea
           v-model="form.problem_overview"
           rows="4"
-          placeholder="Provide a detailed overview of the problem..."
+          :placeholder="t('problemDetails')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Comparison with Similar Applications</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('comparison') }}</label>
         <textarea
           v-model="form.comparison_table_with_similar_applications"
           rows="4"
-          placeholder="Compare your project with similar existing applications..."
+          :placeholder="t('compareApps')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Target Users</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('targetUsers') }}</label>
         <textarea
           v-model="form.project_users"
           rows="3"
-          placeholder="Who will use this system? Students, supervisors, admins..."
+          :placeholder="t('targetUsersPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Problem Mind Map</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">{{ t('problemMindMap') }}</label>
         <div
           class="border-2 border-dashed border-slate-700 rounded-xl p-4 md:p-6 text-center hover:border-brand-purple/50 transition-colors cursor-pointer"
           @click="mindMapProblemInput?.click()"
@@ -150,33 +158,35 @@ const clearMindMapSolution = (): void => {
           </div>
           <div v-else>
             <UIcon name="i-heroicons-photo" class="h-8 w-8 text-slate-600 mx-auto mb-2" />
-            <p class="text-xs text-slate-500">Click to upload mind map image</p>
+            <p class="text-xs text-slate-500">{{ t('clickUpload') }}</p>
           </div>
         </div>
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Solution Overview</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('solutionOverview') }}</label>
         <textarea
           v-model="form.solution_overview"
           rows="4"
-          placeholder="High-level overview of your proposed solution..."
+          :placeholder="t('solutionHighLevel')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Proposed Solution</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('proposedSolution') }}</label>
         <textarea
           v-model="form.proposed_solution"
           rows="5"
-          placeholder="Detailed explanation of your solution, architecture, and approach..."
+          :placeholder="t('solutionDetailed')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Solution Mind Map</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">{{ t('solutionMindMap') }}</label>
         <div
           class="border-2 border-dashed border-slate-700 rounded-xl p-4 md:p-6 text-center hover:border-brand-purple/50 transition-colors cursor-pointer"
           @click="mindMapSolutionInput?.click()"
@@ -199,64 +209,69 @@ const clearMindMapSolution = (): void => {
           </div>
           <div v-else>
             <UIcon name="i-heroicons-photo" class="h-8 w-8 text-slate-600 mx-auto mb-2" />
-            <p class="text-xs text-slate-500">Click to upload mind map image</p>
+            <p class="text-xs text-slate-500">{{ t('clickUpload') }}</p>
           </div>
         </div>
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Functional Requirements</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('functionalReq') }}</label>
         <textarea
           v-model="form.functional_requirements"
           rows="4"
-          placeholder="List the functional requirements of the system..."
+          :placeholder="t('functionalPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Non-Functional Requirements</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('nonFunctionalReq') }}</label>
         <textarea
           v-model="form.non_functional_requirements"
           rows="3"
-          placeholder="Performance, security, scalability, usability requirements..."
+          :placeholder="t('nonFunctionalPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project Management</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('projectManagement') }}</label>
         <textarea
           v-model="form.project_management"
           rows="3"
-          placeholder="Agile methodology, meeting schedule, communication tools, task management..."
+          :placeholder="t('managementPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Programming Languages & Technologies</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('programmingLanguages') }}</label>
         <input
           v-model="form.programming_languages"
           type="text"
-          placeholder="e.g. PHP, JavaScript, TypeScript, HTML, CSS, Laravel, Vue.js, Nuxt..."
+          :placeholder="t('techPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         >
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project Team Members</label>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('teamMembers') }}</label>
         <textarea
           v-model="form.project_teams"
           rows="2"
-          placeholder="Name - Role, Name - Role..."
+          :placeholder="t('teamPlaceholder')"
           class="w-full bg-transparent text-sm text-slate-300 placeholder-slate-600 focus:outline-none border-b border-transparent focus:border-brand-purple/50 pb-2 transition-colors resize-none"
+          :class="dir === 'rtl' ? 'text-right' : 'text-left'"
         />
       </div>
 
       <div class="mb-8">
-        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Required Skills (from Project)</label>
-        <div class="flex flex-wrap gap-2">
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t('requiredSkills') }}</label>
+        <div class="flex flex-wrap gap-2" :class="dir === 'rtl' ? 'justify-end' : 'justify-start'">
           <span
             v-for="skill in project?.required_skills || []"
             :key="skill"
@@ -264,11 +279,11 @@ const clearMindMapSolution = (): void => {
           >
             {{ skill }}
           </span>
-          <span v-if="!project?.required_skills?.length" class="text-xs text-slate-600 italic">No skills specified</span>
+          <span v-if="!project?.required_skills?.length" class="text-xs text-slate-600 italic">{{ t('noSkills') }}</span>
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-800">
+      <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-800" :class="dir === 'rtl' ? 'flex-row-reverse' : ''">
         <button
           class="flex-1 flex items-center justify-center gap-2 bg-brand-purple hover:bg-brand-purple-hover text-white text-sm font-medium px-5 py-3 rounded-xl transition-all disabled:opacity-50"
           :disabled="isSaving"
@@ -276,7 +291,7 @@ const clearMindMapSolution = (): void => {
         >
           <UIcon v-if="isSaving" name="i-heroicons-arrow-path" class="h-4 w-4 animate-spin" />
           <UIcon v-else name="i-heroicons-paper-airplane" class="h-4 w-4" />
-          {{ isSaving ? 'Saving...' : 'Submit Proposal' }}
+          {{ isSaving ? t('saving') : t('submitProposal') }}
         </button>
       </div>
     </div>
