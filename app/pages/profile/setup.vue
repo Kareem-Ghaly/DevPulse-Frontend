@@ -57,22 +57,31 @@ const [bio, bioAttrs] = defineField('bio')
 
 const addCustomSkill = (): void => {
   const trimmed = customSkill.value.trim()
-  if (!trimmed)
-    return
+  if (!trimmed) return
 
+  const upperTrimmed = trimmed.toUpperCase()
   const existingSkill = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
 
   if (!existingSkill) {
-    localSkillsList.value.push(trimmed)
+    localSkillsList.value.push(upperTrimmed)
   }
 
-  const targetSkill = existingSkill || trimmed
-  if (!Array.isArray(skillsField.value)) {
-    skillsField.value = []
-  }
+  const targetSkill = existingSkill || upperTrimmed
 
-  if (!skillsField.value.includes(targetSkill)) {
-    skillsField.value = [...skillsField.value, targetSkill]
+  if (values.role === 'supervisor') {
+    if (!Array.isArray(researchInterestsRef.value)) {
+      researchInterestsRef.value = []
+    }
+    if (!researchInterestsRef.value.includes(targetSkill)) {
+      researchInterestsRef.value = [...researchInterestsRef.value, targetSkill]
+    }
+  } else {
+    if (!Array.isArray(skillsField.value)) {
+      skillsField.value = []
+    }
+    if (!skillsField.value.includes(targetSkill)) {
+      skillsField.value = [...skillsField.value, targetSkill]
+    }
   }
 
   customSkill.value = ''

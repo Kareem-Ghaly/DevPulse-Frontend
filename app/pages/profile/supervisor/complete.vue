@@ -2,15 +2,41 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
-import type { SupervisorProfilePayload } from '~/types/supervisor.types'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 
 definePageMeta({
   layout: 'blank',
 })
 
-const { completeProfile, isLoading } = useSupervisorProfile()
+const config = useRuntimeConfig()
+const appToast = useAppToast()
+const queryClient = useQueryClient()
+const authStore = useAuthStore()
 
+const { data: userData, error: authError } = useQuery({
+  queryKey: ['auth-me'],
+  queryFn: async () => {
+    const token = authStore.token
+    if (!token) throw new Error('No token found')
 
+    return await $fetch(`http://127.0.0.1:8000/api/auth/me`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+  },
+  retry: false
+})
+
+watch(authError, (err) => {
+  if (err) {
+    console.error('Auth error:', err)
+    appToast.error('Session Expired', 'Please login again')
+    navigateTo('/auth/login')
+  }
+})
 
 const researchInterestsList = ref([
   'Artificial Intelligence',
@@ -29,6 +55,10 @@ const researchInterestsList = ref([
   'Node',
   'Laravel',
   'React',
+  'Php',
+  'Python',
+  'JavaScript',
+  'TypeScript'
 ])
 
 const customInterest = ref('')
@@ -38,21 +68,17 @@ const validationSchema = toTypedSchema(
     full_name: z.string().min(3, 'Full name must be at least 3 characters'),
     academic_title: z.string().min(1, 'Academic title is required'),
     department: z.string().min(1, 'Department is required'),
-    specialization: z.string().min(1, 'Specialization is required'),
-    office_hours: z.string().min(1, 'Office hours are required'),
     bio: z.string().min(10, 'Bio must be at least 10 characters'),
     research_interests: z.array(z.string()).min(1, 'At least one research interest is required'),
   }),
 )
 
-const { handleSubmit, errors, defineField } = useForm<SupervisorProfilePayload>({
+const { handleSubmit, errors, defineField, resetForm } = useForm({
   validationSchema,
   initialValues: {
     full_name: '',
     academic_title: 'Doctor',
     department: '',
-    specialization: '',
-    office_hours: '',
     bio: '',
     research_interests: [],
   },
@@ -61,16 +87,54 @@ const { handleSubmit, errors, defineField } = useForm<SupervisorProfilePayload>(
 const [fullName, fullNameAttrs] = defineField('full_name')
 const [academicTitle, academicTitleAttrs] = defineField('academic_title')
 const [department, departmentAttrs] = defineField('department')
-const [specialization, specializationAttrs] = defineField('specialization')
-const [officeHours, officeHoursAttrs] = defineField('office_hours')
 const [bio, bioAttrs] = defineField('bio')
 const [researchInterests] = defineField('research_interests')
+
+watch(() => userData.value, (response) => {
+  if (response?.data) {
+    const data = response.data
+    const profile = data.profile || {}
+    resetForm({
+      values: {
+        full_name: profile.full_name || data.name || '',
+        academic_title: profile.academic_title || 'Doctor',
+        department: profile.department || '',
+        bio: profile.bio || '',
+        research_interests: data.research_interests || [],
+      }
+    })
+  }
+}, { immediate: true })
+
+const { mutate: updateProfile, isPending: isLoading } = useMutation({
+  mutationFn: async (payload: any) => {
+    const token = authStore.token
+    return await $fetch(`http://127.0.0.1:8000/api/supervisor/profile`, {
+      method: 'PUT',
+      body: payload,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+  },
+  onSuccess: () => {
+    appToast.success('Profile Updated!', 'Your profile has been updated successfully.')
+    queryClient.invalidateQueries({ queryKey: ['auth-me'] })
+  },
+  onError: (error: any) => {
+    appToast.error('Error', error?.data?.message || 'Failed to update profile')
+  }
+})
 
 const addCustomInterest = (): void => {
   const trimmed = customInterest.value.trim()
   if (!trimmed) return
 
-  if (!researchInterestsList.value.includes(trimmed)) {
+  const existing = researchInterestsList.value.find(i => i.toLowerCase() === trimmed.toLowerCase())
+  const target = existing || trimmed
+
+  if (!existing) {
     researchInterestsList.value.push(trimmed)
   }
 
@@ -78,15 +142,22 @@ const addCustomInterest = (): void => {
     researchInterests.value = []
   }
 
-  if (!researchInterests.value.includes(trimmed)) {
-    researchInterests.value = [...researchInterests.value, trimmed]
+  if (!researchInterests.value.includes(target)) {
+    researchInterests.value = [...researchInterests.value, target]
   }
 
   customInterest.value = ''
 }
 
 const onSubmit = handleSubmit((formValues) => {
-  completeProfile(formValues)
+  const payload = {
+    full_name: formValues.full_name,
+    academic_title: formValues.academic_title,
+    department: formValues.department,
+    bio: formValues.bio,
+    research_interests: formValues.research_interests || [],
+  }
+  updateProfile(payload)
 })
 
 const uiInputStyle = {
@@ -194,42 +265,32 @@ const uiSelectStyle = {
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-slate-300">Department</label>
-              <UInput
-                v-model="department"
-                v-bind="departmentAttrs"
-                type="text"
-                placeholder="Software Engineering"
-                :ui="uiInputStyle"
-              />
-              <span v-if="errors.department" class="text-xs text-rose-500 block mt-1">{{ errors.department }}</span>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-slate-300">Specialization</label>
-              <UInput
-                v-model="specialization"
-                v-bind="specializationAttrs"
-                type="text"
-                placeholder="Artificial Intelligence"
-                :ui="uiInputStyle"
-              />
-              <span v-if="errors.specialization" class="text-xs text-rose-500 block mt-1">{{ errors.specialization }}</span>
-            </div>
-          </div>
-
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-300">Office Hours</label>
-            <UInput
-              v-model="officeHours"
-              v-bind="officeHoursAttrs"
-              type="text"
-              placeholder="Monday and Wednesday 10:00 AM - 12:00 PM"
-              :ui="uiInputStyle"
-            />
-            <span v-if="errors.office_hours" class="text-xs text-rose-500 block mt-1">{{ errors.office_hours }}</span>
+            <label class="block text-xs font-bold text-slate-300">Department</label>
+            <select
+              v-model="department"
+              v-bind="departmentAttrs"
+              :class="uiSelectStyle.base"
+            >
+              <option value="" disabled>Select your department</option>
+              <option value="Software Engineering">Software Engineering</option>
+              <option value="Computer Science Engineering">Computer Science Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Cybersecurity">Cybersecurity</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
+              <option value="Robotics">Robotics</option>
+              <option value="Game Development">Game Development</option>
+              <option value="Computer Networks">Computer Networks</option>
+              <option value="Computer Engineering">Computer Engineering</option>
+              <option value="Information Engineering">Information Engineering</option>
+              <option value="Human-Computer Interaction">Human-Computer Interaction</option>
+              <option value="Computer Graphics">Computer Graphics</option>
+              <option value="Database Systems">Database Systems</option>
+            </select>
+            <span v-if="errors.department" class="text-xs text-rose-500 block mt-1">{{ errors.department }}</span>
           </div>
 
           <div class="space-y-1.5">
@@ -290,7 +351,7 @@ const uiSelectStyle = {
               :disabled="isLoading"
               class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-brand-purple hover:bg-brand-purple-hover active:bg-brand-purple-active text-white font-bold text-sm transition-all shadow-md shadow-blue-600/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>{{ isLoading ? 'Completing Profile...' : 'Update Profile' }}</span>
+              <span>{{ isLoading ? 'Updating Profile...' : 'Update Profile' }}</span>
               <UIcon v-if="!isLoading" name="i-heroicons-arrow-right" class="h-4 w-4" />
             </button>
           </div>

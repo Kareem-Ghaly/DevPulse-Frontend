@@ -1,68 +1,54 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import type { ComputedRef, Ref } from 'vue'
+import type { ComputedRef } from 'vue'
 
 export function useSupervisorMatches(
-  projectId: ComputedRef<number>, 
+  projectId: ComputedRef<number>,
   proposalId: ComputedRef<number | null>,
   proposalStatus: ComputedRef<string | undefined>
 ) {
   const api = useApiClient()
   const appToast = useAppToast()
   const queryClient = useQueryClient()
-  const router = useRouter()
 
   const selectedSupervisor = ref<number | null>(null)
-
   const canSubmitToCommittee = computed(() => proposalStatus.value === 'supervisor_approved')
 
-  const { data: matchesData, isLoading: isLoadingMatches } = useQuery<SupervisorMatchResponse>({
+  const { data: rawResponse, isLoading: isLoadingMatches } = useQuery({
     queryKey: ['supervisor-matches', projectId],
-    queryFn: () => api.request<SupervisorMatchResponse>(`/project-ideas/${projectId.value}/matching/supervisors`),
+    queryFn: async () => {
+      const res = await api.request(`/project-ideas/${projectId.value}/matching/supervisors`)
+
+      return res?.data ?? res
+    },
     enabled: () => projectId.value > 0,
   })
 
-  const supervisors = computed<SupervisorMatch[]>(() => matchesData.value?.data?.data || [])
+  const supervisors = computed(() => {
+    const payload = rawResponse.value
+    if (!payload) return []
+    const list = payload.data?.data ?? payload.data ?? payload
+    
+    return Array.isArray(list) ? list.filter(Boolean) : []
+  })
 
-  const { mutate: submitToSupervisor, isPending: isSubmittingSupervisor } = useMutation<
-    SubmitProposalResponse, 
-    Error, 
-    number
-  >({
+  const { mutate: submitToSupervisor, isPending: isSubmittingSupervisor } = useMutation({
     mutationFn: async (supervisorId: number) => {
       if (!proposalId.value) throw new Error('No proposal found')
 
-      return await api.request<SubmitProposalResponse>(
-        `/project-proposals/${proposalId.value}/submit`, 
-        { method: 'POST', body: { supervisor_id: supervisorId } }
+      return await api.request(
+        `/project-proposals/${proposalId.value}/submit`,
+        {
+          method: 'POST',
+          body: { supervisor_id: supervisorId },
+        }
       )
     },
-    onSuccess: (res) => {
-      appToast.success('Success', res.message || 'Submitted to supervisor')
+    onSuccess: (res: any) => {
+      appToast.success('Success', res?.message || 'Submitted to supervisor successfully')
       queryClient.invalidateQueries({ queryKey: ['project-proposal-by-team'] })
     },
-    onError: (err) => {
-      appToast.error('Error', err.message || 'Failed to submit')
-    },
-  })
-
-  const { mutate: submitToCommittee, isPending: isSubmittingCommittee } = useMutation<
-    SubmitProposalResponse,
-    Error
-  >({
-    mutationFn: async () => {
-      if (!proposalId.value) throw new Error('No proposal found')
-
-      return await api.request<SubmitProposalResponse>(
-        `/project-proposals/${proposalId.value}/submit-to-committee`,
-        { method: 'POST' }
-      )
-    },
-    onSuccess: (res) => {
-      appToast.success('Success', res.message || 'Submitted to committee')
-      queryClient.invalidateQueries({ queryKey: ['project-proposal-by-team'] })
-    },
-    onError: (err) => {
-      appToast.error('Error', err.message || 'Failed to submit to committee')
+    onError: (err: any) => {
+      appToast.error('Error', err?.message || 'Failed to submit to supervisor')
     },
   })
 
@@ -70,6 +56,24 @@ export function useSupervisorMatches(
     selectedSupervisor.value = supervisorId
     submitToSupervisor(supervisorId)
   }
+
+  const { mutate: submitToCommittee, isPending: isSubmittingCommittee } = useMutation({
+    mutationFn: async () => {
+      if (!proposalId.value) throw new Error('No proposal found')
+
+      return await api.request(
+        `/project-proposals/${proposalId.value}/submit-to-committee`,
+        { method: 'POST' }
+      )
+    },
+    onSuccess: (res: any) => {
+      appToast.success('Success', res?.message || 'Submitted to committee')
+      queryClient.invalidateQueries({ queryKey: ['project-proposal-by-team'] })
+    },
+    onError: (err: any) => {
+      appToast.error('Error', err?.message || 'Failed to submit to committee')
+    },
+  })
 
   return {
     supervisors,

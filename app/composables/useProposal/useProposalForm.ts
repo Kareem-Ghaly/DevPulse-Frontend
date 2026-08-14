@@ -24,7 +24,6 @@ export function useProposalForm(projectId: ComputedRef<number>) {
 
   const projectTeamId = computed(() => {
     const team = (teamData.value as { data?: { team?: { id: number } } })?.data?.team
-
     return team?.id ?? null
   })
 
@@ -72,7 +71,6 @@ export function useProposalForm(projectId: ComputedRef<number>) {
   const populateFormFromProposal = (proposalData: ProjectProposal | null): void => {
     if (!proposalData) {
       isFormInitialized.value = false
-
       return
     }
 
@@ -92,23 +90,20 @@ export function useProposalForm(projectId: ComputedRef<number>) {
     form.status = (proposalData.status as 'draft' | 'submitted') || 'draft'
 
     const isFreshUrl = (url: string | null) => {
-    return url?.startsWith('blob:') || url?.includes('?t=')
-  }
+      return url?.startsWith('blob:') || url?.includes('?t=')
+    }
 
     if (!isFreshUrl(mindMapProblemPreview.value)) {
-    mindMapProblemPreview.value = proposalData.mind_map_problem_url || null
-  }
-  if (!isFreshUrl(mindMapSolutionPreview.value)) {
-    mindMapSolutionPreview.value = proposalData.mind_map_solution_url || null
-  }
+      mindMapProblemPreview.value = proposalData.mind_map_problem_url || null
+    }
+    if (!isFreshUrl(mindMapSolutionPreview.value)) {
+      mindMapSolutionPreview.value = proposalData.mind_map_solution_url || null
+    }
 
-  form.mind_map_problem = null
-  form.mind_map_solution = null
-  if (mindMapProblemInput.value) mindMapProblemInput.value.value = ''
-  if (mindMapSolutionInput.value) mindMapSolutionInput.value.value = ''
-
-  isFormInitialized.value = true
-
+    form.mind_map_problem = null
+    form.mind_map_solution = null
+    if (mindMapProblemInput.value) mindMapProblemInput.value.value = ''
+    if (mindMapSolutionInput.value) mindMapSolutionInput.value.value = ''
 
     isFormInitialized.value = true
   }
@@ -123,13 +118,13 @@ export function useProposalForm(projectId: ComputedRef<number>) {
         isFormInitialized.value = true
       }
     },
-    { immediate: false, deep: true },
+    { immediate: true, deep: true },
   )
 
   watch(
     project,
     (p) => {
-      if (p && !isFormInitialized.value && !form.title) {
+      if (p && !isFormInitialized.value && !proposalData.value?.data?.proposal && !form.title) {
         form.title = p.title
       }
     },
@@ -138,7 +133,6 @@ export function useProposalForm(projectId: ComputedRef<number>) {
 
   const handleMindMapProblem = (event: Event): void => {
     const target = event.target as HTMLInputElement
-
     if (target.files && target.files[0]) {
       form.mind_map_problem = target.files[0]
       mindMapProblemPreview.value = URL.createObjectURL(target.files[0])
@@ -147,7 +141,6 @@ export function useProposalForm(projectId: ComputedRef<number>) {
 
   const handleMindMapSolution = (event: Event): void => {
     const target = event.target as HTMLInputElement
-
     if (target.files && target.files[0]) {
       form.mind_map_solution = target.files[0]
       mindMapSolutionPreview.value = URL.createObjectURL(target.files[0])
@@ -155,22 +148,22 @@ export function useProposalForm(projectId: ComputedRef<number>) {
   }
 
   const clearMindMapProblem = (): void => {
-  if (mindMapProblemPreview.value?.startsWith('blob:')) {
-    URL.revokeObjectURL(mindMapProblemPreview.value)
+    if (mindMapProblemPreview.value?.startsWith('blob:')) {
+      URL.revokeObjectURL(mindMapProblemPreview.value)
+    }
+    form.mind_map_problem = null
+    mindMapProblemPreview.value = null
+    if (mindMapProblemInput.value) mindMapProblemInput.value.value = ''
   }
-  form.value.mind_map_problem = null
-  mindMapProblemPreview.value = null
-  if (mindMapProblemInput.value) mindMapProblemInput.value.value = ''
-}
 
-const clearMindMapSolution = (): void => {
-  if (mindMapSolutionPreview.value?.startsWith('blob:')) {
-    URL.revokeObjectURL(mindMapSolutionPreview.value)
+  const clearMindMapSolution = (): void => {
+    if (mindMapSolutionPreview.value?.startsWith('blob:')) {
+      URL.revokeObjectURL(mindMapSolutionPreview.value)
+    }
+    form.mind_map_solution = null
+    mindMapSolutionPreview.value = null
+    if (mindMapSolutionInput.value) mindMapSolutionInput.value.value = ''
   }
-  form.value.mind_map_solution = null
-  mindMapSolutionPreview.value = null
-  if (mindMapSolutionInput.value) mindMapSolutionInput.value.value = ''
-}
 
   const buildFormData = (isUpdate = false): FormData => {
     const fd = new FormData()
@@ -180,8 +173,8 @@ const clearMindMapSolution = (): void => {
     }
 
     if (projectTeamId.value) {
-    fd.append('project_team_id', String(projectTeamId.value))
-  }
+      fd.append('project_team_id', String(projectTeamId.value))
+    }
 
     fd.append('title', form.title)
     fd.append('problem', form.problem || '')
@@ -211,81 +204,75 @@ const clearMindMapSolution = (): void => {
   }
 
   const { mutate: createProposal, isPending: isCreating } = useMutation<ProposalResponse, ApiError, FormData>({
-  mutationFn: async (formData) => {
-    return await api.request<ProposalResponse>('/project-proposals', {
-      method: 'POST',
-      body: formData,
-    })
-  },
-  onSuccess: (res) => {
-    appToast.success('Success', res.message || 'Proposal created')
-    
-    queryClient.setQueryData(
-      ['project-proposal-by-team', projectTeamId.value],
-      res
-    )
-    
-    if (res.data?.proposal?.mind_map_problem_url) {
-      mindMapProblemPreview.value = res.data.proposal.mind_map_problem_url
-    }
-    if (res.data?.proposal?.mind_map_solution_url) {
-      mindMapSolutionPreview.value = res.data.proposal.mind_map_solution_url
-    }
-  },
-  onError: (err: ApiError) => {
-    if (err.data?.proposal_id) {
-      updateProposal({ id: err.data.proposal_id, formData: buildFormData(true) })
-    } else {
-      appToast.error('Error', err.message || 'Failed to create')
-    }
-  },
-})
+    mutationFn: async (formData) => {
+      return await api.request<ProposalResponse>('/project-proposals', {
+        method: 'POST',
+        body: formData,
+      })
+    },
+    onSuccess: (res) => {
+      appToast.success('Success', res.message || 'Proposal created')
+      queryClient.setQueryData(
+        ['project-proposal-by-team', projectTeamId.value],
+        res
+      )
+      if (res.data?.proposal?.mind_map_problem_url) {
+        mindMapProblemPreview.value = res.data.proposal.mind_map_problem_url
+      }
+      if (res.data?.proposal?.mind_map_solution_url) {
+        mindMapSolutionPreview.value = res.data.proposal.mind_map_solution_url
+      }
+    },
+    onError: (err: ApiError) => {
+      if (err.data?.proposal_id) {
+        updateProposal({ id: err.data.proposal_id, formData: buildFormData(true) })
+      } else {
+        appToast.error('Error', err.message || 'Failed to create')
+      }
+    },
+  })
 
   const { mutate: updateProposal, isPending: isUpdating } = useMutation<ProposalResponse, ApiError, { id: number, formData: FormData }>({
-  mutationFn: async ({ id, formData }) => {
-    return await api.request<ProposalResponse>(`/project-proposals/${id}`, {
-      method: 'POST',
-      body: formData,
-    })
-  },
-  onSuccess: (res) => {
-    appToast.success('Success', res.message || 'Proposal updated')
-    
-    queryClient.setQueryData(
-      ['project-proposal-by-team', projectTeamId.value],
-      res
-    )
-    
-    if (res.data?.proposal?.mind_map_problem_url) {
-      const oldBlob = mindMapProblemPreview.value?.startsWith('blob:') ? mindMapProblemPreview.value : null
-      mindMapProblemPreview.value = res.data.proposal.mind_map_problem_url
-      if (oldBlob) URL.revokeObjectURL(oldBlob)
-    }
-    if (res.data?.proposal?.mind_map_solution_url) {
-      const oldBlob = mindMapSolutionPreview.value?.startsWith('blob:') ? mindMapSolutionPreview.value : null
-      mindMapSolutionPreview.value = res.data.proposal.mind_map_solution_url
-      if (oldBlob) URL.revokeObjectURL(oldBlob)
-    }
-  },
-  onError: (err: ApiError) => {
-    appToast.error('Error', err.message || 'Failed to update')
-  },
-})
+    mutationFn: async ({ id, formData }) => {
+      return await api.request<ProposalResponse>(`/project-proposals/${id}`, {
+        method: 'POST',
+        body: formData,
+      })
+    },
+    onSuccess: (res) => {
+      appToast.success('Success', res.message || 'Proposal updated')
+      queryClient.setQueryData(
+        ['project-proposal-by-team', projectTeamId.value],
+        res
+      )
+      if (res.data?.proposal?.mind_map_problem_url) {
+        const oldBlob = mindMapProblemPreview.value?.startsWith('blob:') ? mindMapProblemPreview.value : null
+        mindMapProblemPreview.value = res.data.proposal.mind_map_problem_url
+        if (oldBlob) URL.revokeObjectURL(oldBlob)
+      }
+      if (res.data?.proposal?.mind_map_solution_url) {
+        const oldBlob = mindMapSolutionPreview.value?.startsWith('blob:') ? mindMapSolutionPreview.value : null
+        mindMapSolutionPreview.value = res.data.proposal.mind_map_solution_url
+        if (oldBlob) URL.revokeObjectURL(oldBlob)
+      }
+    },
+    onError: (err: ApiError) => {
+      appToast.error('Error', err.message || 'Failed to update')
+    },
+  })
 
   const isSaving = computed(() => isCreating.value || isUpdating.value)
 
   const saveProposal = (): void => {
-  const currentProposalId = proposal.value?.id
-
-  if (currentProposalId) {
-    const formData = buildFormData(true)
-    updateProposal({ id: currentProposalId, formData })
+    const currentProposalId = proposal.value?.id
+    if (currentProposalId) {
+      const formData = buildFormData(true)
+      updateProposal({ id: currentProposalId, formData })
+    } else {
+      const formData = buildFormData(false)
+      createProposal(formData)
+    }
   }
-  else {
-    const formData = buildFormData(false)
-    createProposal(formData)
-  }
-}
 
   const saveAsDraft = (): void => {
     form.status = 'draft'

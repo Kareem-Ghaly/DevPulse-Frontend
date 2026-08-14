@@ -254,12 +254,6 @@ onMounted(() => {
             >
               {{ getJoinButtonText(meeting) }}
             </button>
-            <button
-              class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 rounded-lg transition-colors cursor-pointer"
-              @click="viewMeeting(meeting.id)"
-            >
-              View Details
-            </button>
           </div>
         </div>
       </div>

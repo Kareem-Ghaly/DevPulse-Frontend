@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useCreateProject } from '~/composables/useProject/useCreateProject.js'
 
-
 const currentStep = ref(1)
 const totalSteps = 3
 
@@ -13,10 +12,25 @@ const form = reactive({
   required_skills: [] as string[],
 })
 
-
-
 const newSkill = ref('')
+const customSkill = ref('')
 const stepErrors = reactive<Record<string, string>>({})
+
+const localSkillsList = ref([
+  'Vue.js', 'Nuxt 3', 'React', 'Next.js', 'Angular', 'Svelte',
+  'JavaScript', 'TypeScript', 'HTML5', 'CSS3', 'Tailwind CSS', 'SASS',
+  'Node.js', 'Express.js', 'NestJS', 'Laravel', 'PHP', 'Python',
+  'Django', 'Flask', 'C#', 'ASP.NET Core', 'Java', 'Spring Boot',
+  'Kotlin', 'Swift', 'Flutter', 'React Native', 'SQL', 'MySQL',
+  'PostgreSQL', 'SQLite', 'MongoDB', 'Redis', 'Firebase', 'Docker',
+  'Kubernetes', 'AWS', 'Git', 'GitHub', 'GraphQL', 'REST API',
+  'OpenAI API', 'Gemini API', 'LangChain', 'LlamaIndex', 'Hugging Face',
+  'PyTorch', 'TensorFlow', 'N8N', 'Cisco', 'Wireshark', 'TCP/IP',
+  'DNS', 'HTTP/HTTPS', 'WebSockets', 'Laravel Reverb', 'Laravel Echo',
+  'Linux', 'Nginx', 'Machine Learning', 'Artificial Intelligence',
+  'Cybersecurity', 'Cloud Computing', 'Blockchain', 'IoT',
+  'Computer Vision', 'Natural Language Processing', 'Data Science',
+])
 
 const { createProject, isPending } = useCreateProject()
 
@@ -36,6 +50,29 @@ const addSkill = () => {
     newSkill.value = ''
     stepErrors.required_skills = ''
   }
+}
+
+const addCustomSkill = (): void => {
+  const trimmed = customSkill.value.trim()
+  if (!trimmed) return
+
+  const existing = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
+  const target = existing || trimmed
+
+  if (!existing) {
+    localSkillsList.value.push(trimmed)
+  }
+
+  if (!Array.isArray(form.required_skills)) {
+    form.required_skills = []
+  }
+
+  if (!form.required_skills.includes(target)) {
+    form.required_skills = [...form.required_skills, target]
+  }
+
+  customSkill.value = ''
+  stepErrors.required_skills = ''
 }
 
 const removeSkill = (index: number) => {
@@ -116,7 +153,7 @@ const router = useRouter()
           />
         </div>
 
-        <div class="flex lg:flex  w-full justify-around items-center  text-xs font-medium mb-8">
+        <div class="flex lg:flex w-full justify-around items-center text-xs font-medium mb-8">
           <div
             class="flex items-center gap-2"
             :class="currentStep === 1 ? 'text-white' : currentStep > 1 ? 'text-emerald-400' : 'text-slate-500'"
@@ -148,7 +185,7 @@ const router = useRouter()
             :class="currentStep === 3 ? 'text-white' : 'text-slate-500'"
           >
             <div
-              class="h-8 w-8 rounded-full items-center  sm:flex hidden justify-center"
+              class="h-8 w-8 rounded-full items-center sm:flex hidden justify-center"
               :class="currentStep === 3 ? 'bg-brand-purple text-white' : 'bg-panel-dark border border-border-dark'"
             >
               <UIcon name="i-heroicons-layers" class="h-4 w-4" />
@@ -235,24 +272,51 @@ const router = useRouter()
           <div v-if="currentStep === 3" class="space-y-5">
             <div>
               <h2 class="text-lg font-bold text-white">Required Skills & Frameworks</h2>
-              <p class="text-xs text-slate-400 mt-1">Add technical frameworks and tools necessary to accomplish this scope.</p>
+              <p class="text-xs text-slate-400 mt-1">Select or add technical frameworks and tools necessary to accomplish this scope.</p>
             </div>
-            <div class="sm:flex block gap-2">
-              <input
-                v-model="newSkill"
-                type="text"
-                placeholder="e.g. Vue.js, Laravel, Machine Learning"
-                class="flex-1 w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[var(--color-brand-purple)]"
-                @keydown.enter.prevent="addSkill"
-              >
-              <button
-                type="button"
-                class="bg-brand-purple hover:cursor-pointer sm:w-20 w-full py-2 my-2 sm:py-1 sm:my-1 hover:bg-purple-hover text-white px-5 rounded-lg text-sm font-medium"
-                @click="addSkill"
-              >
-                Add
-              </button>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-300">Select Skills</label>
+              <USelectMenu
+                v-model="form.required_skills"
+                :items="localSkillsList"
+                multiple
+                searchable
+                placeholder="Select skills..."
+                class="w-full"
+                :ui-menu="{
+                  background: 'bg-brand-dark',
+                  border: 'border border-border-dark',
+                  option: { text: 'text-white active:bg-blue-600 font-medium' },
+                  input: 'bg-brand-deep border-border-dark text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500',
+                }"
+              />
+              <p v-if="stepErrors.required_skills" class="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                <UIcon name="i-heroicons-exclamation-circle" class="h-3.5 w-3.5" />
+                {{ stepErrors.required_skills }}
+              </p>
             </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-400">Can't find a skill? Add it manually:</label>
+              <div class="flex gap-2">
+                <input
+                  v-model="customSkill"
+                  type="text"
+                  placeholder="e.g. Quantum Computing"
+                  class="flex-1 w-full bg-input-bg border border-input-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-purple"
+                  @keydown.enter.prevent="addCustomSkill"
+                >
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                  @click="addCustomSkill"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="(skill, index) in form.required_skills"
@@ -264,10 +328,6 @@ const router = useRouter()
               </span>
               <p v-if="!form.required_skills.length" class="text-xs text-slate-500">No infrastructure skills injected yet.</p>
             </div>
-            <p v-if="stepErrors.required_skills" class="text-xs text-red-400 flex items-center gap-1">
-              <UIcon name="i-heroicons-exclamation-circle" class="h-3.5 w-3.5" />
-              {{ stepErrors.required_skills }}
-            </p>
           </div>
 
           <div class="flex justify-between items-center mt-8 pt-5 border-t border-[var(--color-border-dark)]">

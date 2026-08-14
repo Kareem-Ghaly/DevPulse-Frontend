@@ -21,7 +21,7 @@ const emit = defineEmits<{
   deleteLink: [linkId: number]
 }>()
 
-const activeTab = ref<'details' | 'attachments' | 'links'>('details')
+const activeTab = ref<'details' | 'attachments' | 'links' | 'supervisor'>('details')
 const isEditing = ref(false)
 
 interface EditForm {
@@ -213,13 +213,13 @@ const statusOptions = [
 
           <div class="flex border-b border-border-dark">
             <button
-              v-for="tab in ['details', 'attachments', 'links'] as const"
+              v-for="tab in ['details', 'attachments', 'links', 'supervisor'] as const"
               :key="tab"
               class="px-4 py-3 text-sm font-medium capitalize transition-colors"
               :class="activeTab === tab ? 'text-brand-purple border-b-2 border-brand-purple' : 'text-slate-500 hover:text-slate-300'"
               @click="activeTab = tab"
             >
-              {{ tab }}
+              {{ tab === 'supervisor' ? 'Supervisor Review' : tab }}
             </button>
           </div>
 
@@ -441,13 +441,51 @@ const statusOptions = [
                     class="text-slate-500 hover:text-rose-400 transition-colors"
                     @click.prevent="$emit('deleteLink', link.id)"
                   >
-                  
                     <UIcon name="i-heroicons-trash" class="h-4 w-4" />
                   </button>
                 </a>
               </div>
               <div v-else class="text-center py-8 text-slate-600">
                 <p class="text-sm">No links yet</p>
+              </div>
+            </div>
+
+            <div v-else-if="activeTab === 'supervisor'">
+              <div v-if="task.latest_review" class="space-y-4">
+                <div class="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <div class="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                    <UIcon name="i-heroicons-user-circle" class="h-6 w-6 text-amber-400" />
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">{{ task.latest_review.supervisor.name }}</p>
+                    <p class="text-xs text-slate-400">{{ task.latest_review.supervisor.email }}</p>
+                  </div>
+                  <div class="ml-auto text-right">
+                    <p class="text-[10px] text-slate-500 uppercase tracking-wider">Reviewed at</p>
+                    <p class="text-xs text-slate-300">
+                      {{ new Date(task.latest_review.reviewed_at).toLocaleDateString() }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-slate-800/50 rounded-lg border border-border-dark">
+                  <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 block">
+                    Review Notes
+                  </label>
+                  <p class="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">
+                    {{ task.latest_review.review }}
+                  </p>
+                </div>
+              </div>
+
+              <div v-else class="text-center py-12">
+                <div class="mb-3 flex justify-center">
+                  <div class="h-16 w-16 rounded-full bg-slate-800 flex items-center justify-center">
+                    <UIcon name="i-heroicons-clipboard-document-list" class="h-8 w-8 text-slate-600" />
+                  </div>
+                </div>
+                <p class="text-sm text-slate-500 font-medium">No supervisor review yet</p>
+                <p class="text-xs text-slate-600 mt-1">The supervisor hasn't reviewed this task.</p>
               </div>
             </div>
           </div>

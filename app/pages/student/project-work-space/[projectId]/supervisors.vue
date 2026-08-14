@@ -83,11 +83,11 @@ const goBack = () => router.push(`/student/project-work-space/${projectId.value}
 
             <div v-else class="space-y-4">
               <SupervisorCard
-                v-for="match in supervisors"
-                :key="match.supervisor.id"
+                v-for="(match, index) in supervisors"
+                :key="match?.supervisor?.id ?? `match-${index}`"
                 :match="match"
                 :is-submitting="isSubmittingSupervisor"
-                :is-selected="selectedSupervisor === match.supervisor.id"
+                :is-selected="selectedSupervisor === match?.supervisor?.id"
                 @select="handleSelectSupervisor"
               />
             </div>

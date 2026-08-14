@@ -11,19 +11,70 @@ const authService = useAuthService()
 const authStore = useAuthStore()
 const appToast = useAppToast()
 
-
-
 const currentStep = ref(1)
 const customSkill = ref('')
 
 const localSkillsList = ref([
-  'Vue.js', 'Nuxt 3', 'React', 'Next.js', 'Angular', 'Svelte',
-  'JavaScript', 'TypeScript', 'HTML5', 'CSS3', 'Tailwind CSS', 'SASS',
-  'Node.js', 'Express.js', 'NestJS', 'Laravel', 'PHP', 'Python',
-  'Django', 'Flask', 'C#', 'ASP.NET Core', 'Java', 'Spring Boot',
-  'Kotlin', 'Swift', 'Flutter', 'React Native', 'SQL', 'MySQL',
-  'PostgreSQL', 'SQLite', 'MongoDB', 'Redis', 'Firebase', 'Docker',
-  'Kubernetes', 'AWS', 'Git', 'GitHub', 'GraphQL', 'REST API'
+  "VUE",
+  "NUXT",
+  "REACT",
+  "NEXT",
+  "ANGULAR",
+  "SVELTE",
+  "JAVASCRIPT",
+  "TYPESCRIPT",
+  "HTML",
+  "CSS",
+  "TAILWIND",
+  "SASS",
+  "NODE",
+  "EXPRESS",
+  "NESTJS",
+  "LARAVEL",
+  "PHP",
+  "PYTHON",
+  "DJANGO",
+  "FLASK",
+  "C#",
+  "ASP",
+  "JAVA",
+  "SPRING",
+  "KOTLIN",
+  "SWIFT",
+  "FLUTTER",
+  "REACT NATIVE",
+  "SQL",
+  "MYSQL",
+  "POSTGRESQL",
+  "SQLITE",
+  "MONGODB",
+  "REDIS",
+  "FIREBASE",
+  "DOCKER",
+  "KUBERNETES",
+  "AWS",
+  "GIT",
+  "GITHUB",
+  "GRAPHQL",
+  "REST API",
+  "OPENAI API",
+  "GEMINI API",
+  "LANGCHAIN",
+  "LLAMAININDEX",
+  "HUGGING FACE",
+  "PYTORCH",
+  "TENSORFLOW",
+  "N8N",
+  "CISCO",
+  "WIRESHARK",
+  "TCP/IP",
+  "DNS",
+  "HTTP/HTTPS",
+  "WEBSOCKETS",
+  "LARAVEL REVERB",
+  "LARAVEL ECHO",
+  "LINUX",
+  "NGINX"
 ])
 
 const { handleSubmit, errors, defineField, values, validateField } = useForm<RegisterInput>({
@@ -46,32 +97,38 @@ const [department, departmentAttrs] = defineField('department')
 const [universityId, universityIdAttrs] = defineField('university_id')
 const [academicYear, academicYearAttrs] = defineField('academic_year')
 const [academicTitle, academicTitleAttrs] = defineField('academic_title')
-const [specialization, specializationAttrs] = defineField('specialization')
-const [officeHours, officeHoursAttrs] = defineField('office_hours')
 const [skillsField] = defineField('skills')
-const researchInterestsRef = ref<string[]>([])
 const [githubLink, githubLinkAttrs] = defineField('github_link')
 const [bio, bioAttrs] = defineField('bio')
+const researchInterestsRef = ref<string[]>([])
 
 const addCustomSkill = (): void => {
   const trimmed = customSkill.value.trim()
-  if (!trimmed) {
-    return
-  }
+  if (!trimmed) return
 
+  const upperTrimmed = trimmed.toUpperCase()
   const existingSkill = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
-  
+
   if (!existingSkill) {
-    localSkillsList.value.push(trimmed)
+    localSkillsList.value.push(upperTrimmed)
   }
 
-  const targetSkill = existingSkill || trimmed
-  if (!Array.isArray(skillsField.value)) {
-    skillsField.value = []
-  }
+  const targetSkill = existingSkill || upperTrimmed
 
-  if (!skillsField.value.includes(targetSkill)) {
-    skillsField.value = [...skillsField.value, targetSkill]
+  if (values.role === 'supervisor') {
+    if (!Array.isArray(researchInterestsRef.value)) {
+      researchInterestsRef.value = []
+    }
+    if (!researchInterestsRef.value.includes(targetSkill)) {
+      researchInterestsRef.value = [...researchInterestsRef.value, targetSkill]
+    }
+  } else {
+    if (!Array.isArray(skillsField.value)) {
+      skillsField.value = []
+    }
+    if (!skillsField.value.includes(targetSkill)) {
+      skillsField.value = [...skillsField.value, targetSkill]
+    }
   }
 
   customSkill.value = ''
@@ -88,7 +145,6 @@ const { mutate: executeRegister, isPending: isLoading } = useMutation({
         user: responseData.data.user,
         role: values.role
       })
-      
       appToast.success('Account Created!', `Welcome to DevPulse, ${values.full_name}!`)
       await navigateTo('/')
     }
@@ -104,27 +160,22 @@ const submitRegistrationForm = (formValues: RegisterInput): void => {
     full_name: formValues.full_name,
     department: formValues.department,
     bio: formValues.bio || '',
-    
     university_id: formValues.university_id,
     academic_year: formValues.academic_year,
     skills: [...(formValues.skills || [])],
     github_link: formValues.github_link || '',
     academic_title: formValues.academic_title,
-    specialization: formValues.specialization,
     office_hours: formValues.office_hours,
     research_interests: [...researchInterestsRef.value],
   }
 
   if (formValues.role === 'supervisor') {
     payload.academic_title = formValues.academic_title || 'Doctor'
-    payload.specialization = formValues.specialization || ''
     payload.office_hours = formValues.office_hours || ''
     payload.research_interests = [...researchInterestsRef.value]
     payload.bio = formValues.bio || ''
-  }
-  else if (formValues.role === 'committee-member') {
+  } else if (formValues.role === 'committee-member') {
     payload.academic_title = formValues.academic_title || 'Doctor'
-    payload.specialization = formValues.specialization || ''
   }
 
   const cleanPayload = JSON.parse(JSON.stringify(payload))
@@ -133,24 +184,18 @@ const submitRegistrationForm = (formValues: RegisterInput): void => {
 
 const nextStep = async () => {
   if (currentStep.value === 1) {
-    if (!values.role) {
-      return
-    }
+    if (!values.role) return
     currentStep.value++
-  }
-  else if (currentStep.value === 2) {
+  } else if (currentStep.value === 2) {
     const emailRes = await validateField('email')
     const passRes = await validateField('password')
     const confRes = await validateField('password_confirmation')
-    
     if ((emailRes.valid && passRes.valid && confRes.valid) || (!errors.value.email && !errors.value.password && !errors.value.password_confirmation)) {
       currentStep.value++
     }
-  }
-  else if (currentStep.value === 3) {
+  } else if (currentStep.value === 3) {
     const nameRes = await validateField('full_name')
     const deptRes = await validateField('department')
-    
     const isStep3BasicValid = (nameRes.valid && deptRes.valid) || (!errors.value.full_name && !errors.value.department)
 
     if (values.role === 'student') {
@@ -158,8 +203,7 @@ const nextStep = async () => {
       if (isStep3BasicValid && (univRes.valid || !errors.value.university_id)) {
         currentStep.value++
       }
-    }
-    else {
+    } else {
       if (isStep3BasicValid) {
         submitRegistrationForm(values)
       }
@@ -168,9 +212,7 @@ const nextStep = async () => {
 }
 
 const prevStep = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--
-  }
+  if (currentStep.value > 1) currentStep.value--
 }
 
 const onSubmit = handleSubmit((finalValues) => {
@@ -189,7 +231,6 @@ const uiSelectStyle = {
 
 <template>
   <div class="min-h-screen bg-brand-dark text-slate-100 font-sans antialiased flex flex-col md:flex-row">
-    
     <div class="hidden md:flex md:w-1/2 p-12 lg:p-16 flex-col justify-between bg-gradient-to-b from-brand-bg to-brand-deep border-r border-slate-900">
       <div class="flex items-center gap-3">
         <div class="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-600/20">
@@ -249,9 +290,7 @@ const uiSelectStyle = {
 
     <div class="w-full md:w-1/2 flex flex-col justify-center items-center px-6 py-12 lg:px-16 bg-brand-deep">
       <div class="w-full max-w-lg">
-        
         <form class="space-y-6" @submit.prevent="onSubmit">
-
           <div v-if="currentStep === 1" class="space-y-6">
             <div class="text-center md:text-left space-y-1">
               <h2 class="text-4xl font-black text-white tracking-tight">Choose Your Role</h2>
@@ -327,14 +366,20 @@ const uiSelectStyle = {
             <div class="space-y-4">
               <div class="space-y-1.5">
                 <div :class="['space-y-1.5', role === 'supervisor' ? 'grid grid-cols-2 gap-4' : '']">
-                  <div class="">
+                  <div>
                     <label class="block text-xs font-bold text-slate-300">Full Name</label>
                     <UInput v-model="fullName" class="w-full pt-2" v-bind="fullNameAttrs" type="text" placeholder="Enter full name" :ui="uiInputStyle" />
                     <span v-if="errors.full_name" class="text-xs text-rose-500 block mt-1">{{ errors.full_name }}</span>
                   </div>
-                  <div v-if="role === 'supervisor'">
-                    <label class="block text-xs font-bold text-slate-300">Office Hours</label>
-                    <UInput class="pt-2" v-model="officeHours" v-bind="officeHoursAttrs" type="text" placeholder="e.g. Sun 10:00 AM" :ui="uiInputStyle" />
+                  <div v-if="role === 'supervisor' || role === 'committee-member'">
+                    <div class="space-y-1.5">
+                      <label class="block text-xs font-bold text-slate-300">Academic Title</label>
+                      <select v-model="academicTitle" v-bind="academicTitleAttrs" :class="uiSelectStyle.base">
+                        <option value="Doctor">Doctor</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Engineer">Engineer</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -348,32 +393,23 @@ const uiSelectStyle = {
                 <div class="space-y-1.5">
                   <label class="block text-xs font-bold text-slate-300">Academic Year</label>
                   <select v-model="academicYear" v-bind="academicYearAttrs" :class="uiSelectStyle.base">
-                    <option value="1">First Year</option><option value="2">Second Year</option><option value="3">Third Year</option><option value="4">Fourth Year</option><option value="5">Fifth Year</option>
+                    <option value="1">First Year</option>
+                    <option value="2">Second Year</option>
+                    <option value="3">Third Year</option>
+                    <option value="4">Fourth Year</option>
+                    <option value="5">Fifth Year</option>
                   </select>
-                </div>
-              </div>
-
-              <div v-if="role === 'supervisor' || role === 'committee-member'" class="grid grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                  <label class="block text-xs font-bold text-slate-300">Academic Title</label>
-                  <select v-model="academicTitle" v-bind="academicTitleAttrs" :class="uiSelectStyle.base">
-                    <option value="Doctor">Doctor</option><option value="Professor">Professor</option><option value="Engineer">Engineer</option>
-                  </select>
-                </div>
-                <div class="space-y-1.5">
-                  <label class="block text-xs font-bold text-slate-300">Specialization</label>
-                  <UInput v-model="specialization" v-bind="specializationAttrs" type="text" placeholder="e.g. AI" :ui="uiInputStyle" />
                 </div>
               </div>
 
               <div v-if="role === 'supervisor'" class="space-y-1.5">
-                <label class="block text-xs font-bold text-slate-300">Research Interests</label>
+                <label class="block text-xs font-bold text-slate-300">Skills</label>
                 <USelectMenu
                   v-model="researchInterestsRef"
                   :items="localSkillsList"
                   multiple
                   searchable
-                  placeholder="Select research interests..."
+                  placeholder="Select Skills..."
                   class="w-full"
                   :ui-menu="{ 
                     background: 'bg-brand-dark', 
@@ -384,9 +420,37 @@ const uiSelectStyle = {
                 />
               </div>
 
+              <div v-if="role === 'supervisor'" class="space-y-1.5">
+                <label class="block text-xs font-bold text-slate-400">Can't find a skill? Add it manually:</label>
+                <div class="flex gap-2">
+                  <UInput v-model="customSkill" type="text" placeholder="e.g. TensorFlow" :ui="uiInputStyle" class="flex-1" @keydown.enter.prevent="addCustomSkill" />
+                  <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer" @click="addCustomSkill">
+                    Add
+                  </button>
+                </div>
+              </div>
+
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-slate-300">Department</label>
-                <UInput v-model="department" class="w-full pt-2" v-bind="departmentAttrs" type="text" placeholder="e.g. Software Engineering" :ui="uiInputStyle" />
+                <select v-model="department" v-bind="departmentAttrs" :class="uiSelectStyle.base">
+                  <option value="" disabled selected>Select your department</option>
+                  <option value="Software Engineering">Software Engineering</option>
+                  <option value="Computer Science Engineering">Computer Science Engineering</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="Cybersecurity">Cybersecurity</option>
+                  <option value="Cloud Computing">Cloud Computing</option>
+                  <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
+                  <option value="Robotics">Robotics</option>
+                  <option value="Game Development">Game Development</option>
+                  <option value="Computer Networks">Computer Networks</option>
+                  <option value="Computer Engineering">Computer Engineering</option>
+                  <option value="Information Engineering">Information Engineering</option>
+                  <option value="Human-Computer Interaction">Human-Computer Interaction</option>
+                  <option value="Computer Graphics">Computer Graphics</option>
+                  <option value="Database Systems">Database Systems</option>
+                </select>
                 <span v-if="errors.department" class="text-xs text-rose-500 block mt-1">{{ errors.department }}</span>
               </div>
 
@@ -445,7 +509,7 @@ const uiSelectStyle = {
                 <UInput v-model="githubLink" class="w-full" v-bind="githubLinkAttrs" type="url" placeholder="https://github.com/username" :ui="uiInputStyle" />
                 <span v-if="errors.github_link" class="text-xs text-rose-500 block mt-1">{{ errors.github_link }}</span>
               </div>
-
+              
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-slate-300">Academic Biography</label>
                 <textarea v-model="bio" v-bind="bioAttrs" rows="3" class="w-full bg-input-bg border border-input-border rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none" placeholder="Tell us about yourself..." />
@@ -458,7 +522,6 @@ const uiSelectStyle = {
               </button>
             </div>
           </div>
-
         </form>
         
         <div class="text-center mt-6">
@@ -466,7 +529,6 @@ const uiSelectStyle = {
             Already have an account? <span class="text-brand-purple font-bold ml-1">Sign in</span>
           </ULink>
         </div>
-
       </div>
     </div>
   </div>

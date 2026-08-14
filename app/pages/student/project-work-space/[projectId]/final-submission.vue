@@ -19,6 +19,18 @@ const form = reactive({
   student_notes: '',
 })
 
+const finalGrade = computed(() => {
+  if (!submission.value) return 0
+  
+  const proposal = Number(submission.value.proposal_grade) || 0
+  const presentation = Number(submission.value.presentation_grade) || 0
+  const code = Number(submission.value.code_grade) || 0
+  
+  if (proposal === 0 && presentation === 0 && code === 0) return 0
+  
+  return Math.round((proposal + presentation + code) / 3)
+})
+
 const fetchTeam = async () => {
   if (!projectIdeaId.value) {
     return
@@ -65,8 +77,8 @@ const handleSubmit = (): void => {
           Loading team info...
         </div>
 
-        <div v-else-if="!projectTeamId" class="text-center text-red-400 py-10">
-          Could not find your team for this project.
+        <div v-else-if="!projectTeamId" class="text-center  text-slate-400 py-10">
+          Loading for Submission
         </div>
 
         <div v-else-if="!submission || submission.status === 'rejected'" class="bg-panel-dark border border-border-dark rounded-xl p-4 md:p-6 space-y-5">
@@ -181,10 +193,11 @@ const handleSubmit = (): void => {
                 {{ submission.code_feedback }}
               </p>
             </div>
+            
             <div class="bg-emerald-900/20 rounded-lg p-3 border border-emerald-500/20">
-              <div class="flex justify-between text-sm">
-                <span class="text-emerald-400 font-bold">Total Grade</span>
-                <span class="text-emerald-400 font-bold text-lg">{{ submission.total_grade }}/300</span>
+              <div class="flex justify-between text-sm items-center">
+                <span class="text-emerald-400 font-bold">Final Grade</span>
+                <span class="text-emerald-400 font-bold text-lg">{{ finalGrade }}/100</span>
               </div>
             </div>
           </div>
