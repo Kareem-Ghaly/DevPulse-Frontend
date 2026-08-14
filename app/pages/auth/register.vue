@@ -11,6 +11,8 @@ const authService = useAuthService()
 const authStore = useAuthStore()
 const appToast = useAppToast()
 
+
+
 const currentStep = ref(1)
 const customSkill = ref('')
 

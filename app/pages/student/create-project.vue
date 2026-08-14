@@ -13,6 +13,8 @@ const form = reactive({
   required_skills: [] as string[],
 })
 
+
+
 const newSkill = ref('')
 const stepErrors = reactive<Record<string, string>>({})
 

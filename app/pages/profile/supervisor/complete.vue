@@ -10,6 +10,8 @@ definePageMeta({
 
 const { completeProfile, isLoading } = useSupervisorProfile()
 
+
+
 const researchInterestsList = ref([
   'Artificial Intelligence',
   'Machine Learning',

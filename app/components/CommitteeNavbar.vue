@@ -9,6 +9,8 @@ const navItems = [
   { label: 'Profile', icon: 'i-heroicons-user-circle', to: '/committee/profile' },
 ]
 
+
+
 const isActive = (path: string) => route.path.startsWith(path)
 
 const handleLogout = () => {

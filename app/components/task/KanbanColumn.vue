@@ -7,6 +7,7 @@ interface Props {
   isDragOver?: boolean
 }
 
+
 const props = defineProps<Props>()
 
 const emit = defineEmits<{

@@ -7,6 +7,8 @@ interface SidebarItem {
   onClick?: () => void
 }
 
+
+
 interface Props {
   items: SidebarItem[]
   showUser?: boolean

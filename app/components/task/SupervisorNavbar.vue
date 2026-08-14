@@ -12,6 +12,7 @@ const { mutate: logoutUser } = useMutation({
     })
 
     return response
+    
   },
   onSuccess: () => {
     appToast.success('Logged out', 'You have been successfully logged out.')

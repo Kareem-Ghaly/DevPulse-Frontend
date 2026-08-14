@@ -7,6 +7,8 @@ const { removeToken, listenToMessages } = useFirebaseMessaging()
 const { notifications, unreadCount, fetchNotifications, markAllAsRead } = useNotifications()
 const showNotifications = ref(false)
 
+
+
 const handleLogout = async (): Promise<void> => {
   await removeToken()
   await authStore.logout()

@@ -441,6 +441,7 @@ const statusOptions = [
                     class="text-slate-500 hover:text-rose-400 transition-colors"
                     @click.prevent="$emit('deleteLink', link.id)"
                   >
+                  
                     <UIcon name="i-heroicons-trash" class="h-4 w-4" />
                   </button>
                 </a>

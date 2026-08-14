@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     public: {
       pusherKey: process.env.NUXT_PUBLIC_PUSHER_KEY,
       pusherCluster: process.env.NUXT_PUBLIC_PUSHER_CLUSTER,
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://127.0.0.1:8000/api',
+      apiBase: 'http://127.0.0.1:8000/api',
       firebaseApiKey: '',
       firebaseAuthDomain: '',
       firebaseProjectId: '',
