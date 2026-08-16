@@ -109,7 +109,7 @@ watch(() => userData.value, (response) => {
 const { mutate: updateProfile, isPending: isLoading } = useMutation({
   mutationFn: async (payload: any) => {
     const token = authStore.token
-    return await $fetch(`http://127.0.0.1:8000/api/supervisor/profile`, {
+    return await $fetch(`http://127.0.0.1:8000/api/profile/supervisor/complete`, {
       method: 'PUT',
       body: payload,
       headers: {
