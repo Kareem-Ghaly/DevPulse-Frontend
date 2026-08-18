@@ -81,17 +81,8 @@ const localSkillsList = ref([
 
 const { createProject, isPending } = useCreateProject()
 
-const toPascalCase = (value: string): string => {
-  return value
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
-}
-
 const addSkill = () => {
-  const skill = toPascalCase(newSkill.value)
+  const skill = normalizeSkill(newSkill.value)
   if (skill && !form.required_skills.includes(skill)) {
     form.required_skills.push(skill)
     newSkill.value = ''
@@ -100,14 +91,14 @@ const addSkill = () => {
 }
 
 const addCustomSkill = (): void => {
-  const trimmed = customSkill.value.trim()
-  if (!trimmed) return
+  const normalized = normalizeSkill(customSkill.value)
+  if (!normalized) return
 
-  const existing = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
-  const target = existing || trimmed
+  const existing = localSkillsList.value.find(s => normalizeSkill(s) === normalized)
+  const target = normalizeSkill(existing || normalized)
 
   if (!existing) {
-    localSkillsList.value.push(trimmed)
+    localSkillsList.value.push(normalized)
   }
 
   if (!Array.isArray(form.required_skills)) {
@@ -161,7 +152,7 @@ const nextStep = () => {
   if (currentStep.value < totalSteps) {
     currentStep.value++
   } else {
-    createProject({ ...form })
+    createProject({ ...form, required_skills: normalizeSkills(form.required_skills) })
   }
 }
 

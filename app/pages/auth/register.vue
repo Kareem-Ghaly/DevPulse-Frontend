@@ -103,17 +103,16 @@ const [bio, bioAttrs] = defineField('bio')
 const researchInterestsRef = ref<string[]>([])
 
 const addCustomSkill = (): void => {
-  const trimmed = customSkill.value.trim()
-  if (!trimmed) return
+  const normalized = normalizeSkill(customSkill.value)
+  if (!normalized) return
 
-  const upperTrimmed = trimmed.toUpperCase()
-  const existingSkill = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
+  const existingSkill = localSkillsList.value.find(s => normalizeSkill(s) === normalized)
 
   if (!existingSkill) {
-    localSkillsList.value.push(upperTrimmed)
+    localSkillsList.value.push(normalized)
   }
 
-  const targetSkill = existingSkill || upperTrimmed
+  const targetSkill = normalizeSkill(existingSkill || normalized)
 
   if (values.role === 'supervisor') {
     if (!Array.isArray(researchInterestsRef.value)) {
@@ -162,17 +161,17 @@ const submitRegistrationForm = (formValues: RegisterInput): void => {
     bio: formValues.bio || '',
     university_id: formValues.university_id,
     academic_year: formValues.academic_year,
-    skills: [...(formValues.skills || [])],
+    skills: normalizeSkills(formValues.skills || []),
     github_link: formValues.github_link || '',
     academic_title: formValues.academic_title,
     office_hours: formValues.office_hours,
-    research_interests: [...researchInterestsRef.value],
+    research_interests: normalizeSkills(researchInterestsRef.value),
   }
 
   if (formValues.role === 'supervisor') {
     payload.academic_title = formValues.academic_title || 'Doctor'
     payload.office_hours = formValues.office_hours || ''
-    payload.research_interests = [...researchInterestsRef.value]
+    payload.research_interests = normalizeSkills(researchInterestsRef.value)
     payload.bio = formValues.bio || ''
   } else if (formValues.role === 'committee-member') {
     payload.academic_title = formValues.academic_title || 'Doctor'

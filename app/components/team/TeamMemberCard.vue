@@ -77,8 +77,9 @@ const initials = computed(() => getInitials(props.match.student.name))
             {{ skill }}
           </span>
         </div>
-        <slot name="action"/>
       </div>
     </div>
+
+    <slot name="action"/>
   </div>
 </template>

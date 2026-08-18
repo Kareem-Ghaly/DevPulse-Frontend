@@ -29,6 +29,14 @@ export function getSkillClasses(skill: string): string {
   return colors[key] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'
 }
 
+export function normalizeSkill(skill: string): string {
+  return skill.trim().replace(/\s+/g, ' ').toUpperCase()
+}
+
+export function normalizeSkills(skills: string[] = []): string[] {
+  return [...new Set(skills.map(normalizeSkill).filter(Boolean))]
+}
+
 export function getMatchColor(percentage: number): string {
   if (percentage >= 80) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
   if (percentage >= 50) return 'text-amber-400 bg-amber-500/10 border-amber-500/20'

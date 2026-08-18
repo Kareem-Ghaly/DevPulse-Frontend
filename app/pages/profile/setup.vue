@@ -109,17 +109,16 @@ const [skillsField] = defineField('skills')
 const [bio, bioAttrs] = defineField('bio')
 
 const addCustomSkill = (): void => {
-  const trimmed = customSkill.value.trim()
-  if (!trimmed) return
+  const normalized = normalizeSkill(customSkill.value)
+  if (!normalized) return
 
-  const upperTrimmed = trimmed.toUpperCase()
-  const existingSkill = localSkillsList.value.find(s => s.toLowerCase() === trimmed.toLowerCase())
+  const existingSkill = localSkillsList.value.find(s => normalizeSkill(s) === normalized)
 
   if (!existingSkill) {
-    localSkillsList.value.push(upperTrimmed)
+    localSkillsList.value.push(normalized)
   }
 
-  const targetSkill = existingSkill || upperTrimmed
+  const targetSkill = normalizeSkill(existingSkill || normalized)
 
   if (values.role === 'supervisor') {
     if (!Array.isArray(researchInterestsRef.value)) {
@@ -168,7 +167,7 @@ const onSubmit = handleSubmit((formValues) => {
     university_id: formValues.university_id,
     department: formValues.department,
     academic_year: formValues.academic_year,
-    skills: formValues.skills || [],
+    skills: normalizeSkills(formValues.skills || []),
     bio: formValues.bio || '',
   }
 

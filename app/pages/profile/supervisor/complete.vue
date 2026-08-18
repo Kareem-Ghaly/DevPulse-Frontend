@@ -13,6 +13,20 @@ const appToast = useAppToast()
 const queryClient = useQueryClient()
 const authStore = useAuthStore()
 
+interface SupervisorProfileForm {
+  full_name: string
+  academic_title: string
+  department: string
+  bio: string
+  research_interests: string[]
+}
+
+interface FetchError {
+  data?: {
+    message?: string
+  }
+}
+
 const { data: userData, error: authError } = useQuery({
   queryKey: ['auth-me'],
   queryFn: async () => {
@@ -59,7 +73,7 @@ const researchInterestsList = ref([
   'Python',
   'JavaScript',
   'TypeScript'
-])
+].map(normalizeSkill))
 
 const customInterest = ref('')
 
@@ -100,15 +114,16 @@ watch(() => userData.value, (response) => {
         academic_title: profile.academic_title || 'Doctor',
         department: profile.department || '',
         bio: profile.bio || '',
-        research_interests: data.research_interests || [],
+        research_interests: normalizeSkills(data.research_interests || []),
       }
     })
   }
 }, { immediate: true })
 
 const { mutate: updateProfile, isPending: isLoading } = useMutation({
-  mutationFn: async (payload: any) => {
+  mutationFn: async (payload: SupervisorProfileForm) => {
     const token = authStore.token
+
     return await $fetch(`http://127.0.0.1:8000/api/profile/supervisor/complete`, {
       method: 'PUT',
       body: payload,
@@ -122,20 +137,20 @@ const { mutate: updateProfile, isPending: isLoading } = useMutation({
     appToast.success('Profile Updated!', 'Your profile has been updated successfully.')
     queryClient.invalidateQueries({ queryKey: ['auth-me'] })
   },
-  onError: (error: any) => {
+  onError: (error: FetchError) => {
     appToast.error('Error', error?.data?.message || 'Failed to update profile')
   }
 })
 
 const addCustomInterest = (): void => {
-  const trimmed = customInterest.value.trim()
-  if (!trimmed) return
+  const normalized = normalizeSkill(customInterest.value)
+  if (!normalized) return
 
-  const existing = researchInterestsList.value.find(i => i.toLowerCase() === trimmed.toLowerCase())
-  const target = existing || trimmed
+  const existing = researchInterestsList.value.find(i => normalizeSkill(i) === normalized)
+  const target = normalizeSkill(existing || normalized)
 
   if (!existing) {
-    researchInterestsList.value.push(trimmed)
+    researchInterestsList.value.push(normalized)
   }
 
   if (!Array.isArray(researchInterests.value)) {
@@ -155,7 +170,7 @@ const onSubmit = handleSubmit((formValues) => {
     academic_title: formValues.academic_title,
     department: formValues.department,
     bio: formValues.bio,
-    research_interests: formValues.research_interests || [],
+    research_interests: normalizeSkills(formValues.research_interests || []),
   }
   updateProfile(payload)
 })
