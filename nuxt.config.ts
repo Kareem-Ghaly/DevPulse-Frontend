@@ -8,7 +8,7 @@ export default defineNuxtConfig({
 
   icon: {
     serverBundle: {
-      collections: ['uil', 'mdi']
+      collections: ['heroicons', 'lucide']
     }
   },
 
