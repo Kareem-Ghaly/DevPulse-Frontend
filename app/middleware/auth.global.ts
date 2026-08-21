@@ -1,13 +1,10 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const token = useCookie('devpulse_vault_token').value
+  if (import.meta.server) return
 
-  const publicRoutes = ['/', '/auth/login', '/auth/register', '/auth/forgot-password']
+  const token = useCookie('devpulse_vault_token').value
+  const publicRoutes = ['/', '/auth/login', '/auth/register', '/auth/admin/login']
 
   if (!token && !publicRoutes.includes(to.path)) {
     return navigateTo('/auth/login', { replace: true })
-  }
-
-  if (token && to.path === '/auth/login') {
-    return navigateTo('/', { replace: true })
   }
 })
