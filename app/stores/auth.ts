@@ -2,17 +2,15 @@ import { defineStore } from 'pinia'
 import type { UserProfile } from '~/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
-  const config = useRuntimeConfig()
-
   const cookieOptions = {
     maxAge: 60 * 60 * 24 * 7,
     path: '/',
-    secure: process.env.NODE_ENV === 'production' || window?.location?.protocol === 'https:',
+    secure: true,
     sameSite: 'lax' as const,
     httpOnly: false,
   }
 
-  const token = useCookie<string | null>('devpulse_vault_token', cookieOptions)
+  const token = useCookie<string | undefined>('devpulse_vault_token', cookieOptions)
   
   const user = useState<UserProfile | null>('auth_user', () => null)
   const role = useState<string | null>('auth_role', () => null)
@@ -26,7 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    token.value = null
+    token.value = undefined
     user.value = null
     role.value = null
   }
