@@ -1,15 +1,22 @@
-	<script setup lang="ts">
+<script setup lang="ts">
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useMutation } from '@tanstack/vue-query'
 import { LoginSchema, type LoginInput } from '../../schemas/auth.schema'
+import {
+  BoltIcon,
+  UsersIcon,
+  AcademicCapIcon,
+  GlobeAltIcon,
+  ArrowPathIcon,
+  EnvelopeIcon,
+  ArrowRightIcon,
+} from '@heroicons/vue/24/outline'
 
 const authService = useAuthService()
 const authStore = useAuthStore()
 const appToast = useAppToast()
 const router = useRouter()
-
-
 
 const isGoogleLoading = ref(false)
 const isGithubLoading = ref(false)
@@ -115,7 +122,7 @@ const inputUiConfig = {
     <div class="hidden md:flex md:w-1/2 p-12 lg:p-16 flex-col justify-between bg-gradient-to-b from-brand-bg to-brand-deep border-r border-slate-900">
       <div class="flex items-center gap-3">
         <div class="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-600/20">
-          <UIcon name="i-heroicons-bolt" class="h-5 w-5" />
+          <BoltIcon class="h-5 w-5" />
         </div>
         <span class="text-xl font-bold tracking-tight text-white">DevPulse</span>
       </div>
@@ -133,7 +140,7 @@ const inputUiConfig = {
         <div class="space-y-4">
           <div class="flex items-start gap-4 p-4 rounded-xl border border-border-dark bg-brand-bg/50 backdrop-blur-sm">
             <div class="p-2 rounded-lg bg-blue-600/10 text-blue-400 mt-0.5">
-              <UIcon name="i-heroicons-bolt" class="h-5 w-5" />
+              <BoltIcon class="h-5 w-5" />
             </div>
             <div>
               <h4 class="font-bold text-white">Real-time Collaboration</h4>
@@ -143,7 +150,7 @@ const inputUiConfig = {
 
           <div class="flex items-start gap-4 p-4 rounded-xl border border-border-dark bg-brand-bg/50 backdrop-blur-sm">
             <div class="p-2 rounded-lg bg-indigo-600/10 text-indigo-400 mt-0.5">
-              <UIcon name="i-heroicons-users" class="h-5 w-5" />
+              <UsersIcon class="h-5 w-5" />
             </div>
             <div>
               <h4 class="font-bold text-white">Smart Team Matching</h4>
@@ -153,7 +160,7 @@ const inputUiConfig = {
 
           <div class="flex items-start gap-4 p-4 rounded-xl border border-border-dark bg-brand-bg/50 backdrop-blur-sm">
             <div class="p-2 rounded-lg bg-purple-600/10 text-purple-400 mt-0.5">
-              <UIcon name="i-heroicons-academic-cap" class="h-5 w-5" />
+              <AcademicCapIcon class="h-5 w-5" />
             </div>
             <div>
               <h4 class="font-bold text-white">Supervisor Insights</h4>
@@ -188,14 +195,25 @@ const inputUiConfig = {
               class="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border-slate bg-panel-dark text-xs font-semibold text-slate-200 hover:bg-[#121d42] transition-colors cursor-pointer disabled:opacity-50"
               @click="handleGithubLogin"
             >
-              <UIcon
-                :name="isGithubLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-globe-alt'"
-                :class="['h-4 w-4 text-slate-400', isGithubLoading && 'animate-spin']"
+              <ArrowPathIcon
+                v-if="isGithubLoading"
+                class="h-4 w-4 text-slate-400 animate-spin"
+              />
+              <GlobeAltIcon
+                v-else
+                class="h-4 w-4 text-slate-400"
               />
               GitHub
             </button>
             <button type="button" :disabled="isGoogleLoading" class="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border-slate bg-panel-dark text-xs font-semibold text-slate-200 hover:bg-[#121d42] transition-colors cursor-pointer disabled:opacity-50" @click="handleGoogleLogin">
-              <UIcon :name="isGoogleLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-envelope'" :class="['h-4 w-4 text-slate-400', isGoogleLoading && 'animate-spin']" />
+              <ArrowPathIcon
+                v-if="isGoogleLoading"
+                class="h-4 w-4 text-slate-400 animate-spin"
+              />
+              <EnvelopeIcon
+                v-else
+                class="h-4 w-4 text-slate-400"
+              />
               Google
             </button>
           </div>
@@ -253,7 +271,7 @@ const inputUiConfig = {
                 class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-brand-purple hover:bg-brand-purple-hover active:bg-brand-purple-active text-white font-bold text-sm transition-all shadow-md shadow-blue-600/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span>{{ isLoading ? 'Signing in...' : 'Sign in' }}</span>
-                <UIcon v-if="!isLoading" name="i-heroicons-arrow-right" class="h-4 w-4" />
+                <ArrowRightIcon v-if="!isLoading" class="h-4 w-4" />
               </button>
             </div>
           </form>

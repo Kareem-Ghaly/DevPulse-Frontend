@@ -3,6 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useMutation } from '@tanstack/vue-query'
 import { AdminLoginSchema } from '#imports'
+import { ShieldCheckIcon, KeyIcon } from '@heroicons/vue/24/outline'
 
 definePageMeta({
   layout: 'blank'
@@ -67,7 +68,7 @@ const uiInputStyle = {
     <div class="hidden md:flex md:w-1/2 p-12 lg:p-16 flex-col justify-between bg-gradient-to-b from-slate-950 to-brand-deep border-r border-purple-900/30">
       <div class="flex items-center gap-3">
         <div class="h-9 w-9 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold shadow-md shadow-purple-600/20">
-          <UIcon name="i-heroicons-shield-check" class="h-5 w-5" />
+          <ShieldCheckIcon class="h-5 w-5" />
         </div>
         <span class="text-xl font-bold tracking-tight text-white">DevPulse <span class="text-purple-400 text-xs font-semibold">Admin</span></span>
       </div>
@@ -108,7 +109,7 @@ const uiInputStyle = {
 
             <button :disabled="isLoading" type="submit" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm transition-all disabled:opacity-50 cursor-pointer shadow-lg shadow-purple-600/10 mt-6">
               <span>{{ isLoading ? 'Authenticating Core...' : 'Enter Console' }}</span>
-              <UIcon v-if="!isLoading" name="i-heroicons-key" class="h-4 w-4" />
+              <KeyIcon v-if="!isLoading" class="h-4 w-4" />
             </button>
           </form>
         </div>

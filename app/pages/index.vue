@@ -10,6 +10,35 @@ const particles = ref<Array<{x: number, y: number, size: number, speedX: number,
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animationFrame: number
 
+import {
+  AcademicCapIcon,
+  UserGroupIcon,
+  ClipboardDocumentCheckIcon,
+  ShieldCheckIcon,
+  BoltIcon,
+  ArrowRightIcon,
+  PlayCircleIcon,
+  LockClosedIcon,
+  FolderIcon,
+  CheckCircleIcon,
+  UsersIcon,
+  CheckIcon,
+  SparklesIcon,
+  UserPlusIcon,
+  Squares2X2Icon,
+  CodeBracketIcon,
+  EyeIcon,
+  CubeIcon,
+  MapIcon,
+  RocketLaunchIcon,
+  BookOpenIcon,
+  GlobeAltIcon,
+  EnvelopeIcon,
+  LightBulbIcon,
+  WrenchScrewdriverIcon,
+  DocumentTextIcon,
+} from '@heroicons/vue/24/outline'
+
 const initParticles = () => {
   const canvas = canvasRef.value
   if (!canvas) return
@@ -86,28 +115,28 @@ const accounts = [
     title: 'Student',
     desc: 'Learn, build skills, and join graduation projects.',
     route: '/auth/login',
-    icon: 'i-heroicons-academic-cap',
+    icon: AcademicCapIcon,
   },
   {
     key: 'professor',
     title: 'Professor',
     desc: 'Guide students and supervise projects.',
     route: '/auth/login',
-    icon: 'i-heroicons-user-group',
+    icon: UserGroupIcon,
   },
   {
     key: 'committee',
     title: 'Committee',
     desc: 'Evaluate and track project progress.',
     route: '/auth/login',
-    icon: 'i-heroicons-clipboard-document-check',
+    icon: ClipboardDocumentCheckIcon,
   },
   {
     key: 'admin',
     title: 'Admin',
     desc: 'Manage platform and users.',
     route: '/auth/admin/login',
-    icon: 'i-heroicons-shield-check',
+    icon: ShieldCheckIcon,
   },
 ]
 
@@ -120,27 +149,27 @@ const features = [
   {
     title: 'Unified Workspace',
     desc: 'All project tools in one place — tasks, diagrams, files, and communication.',
-    icon: 'i-heroicons-squares-2x2',
+    icon: Squares2X2Icon,
   },
   {
     title: 'Real-time Collaboration',
     desc: 'Edit diagrams and code together with your team in real-time.',
-    icon: 'i-heroicons-users',
+    icon: UsersIcon,
   },
   {
     title: 'Smart Team Matching',
     desc: 'Find teammates with complementary skills based on AI analysis.',
-    icon: 'i-heroicons-user-plus',
+    icon: UserPlusIcon,
   },
   {
     title: 'GitHub Integration',
     desc: 'Sync commits, branches, and track individual contributions automatically.',
-    icon: 'i-heroicons-code-bracket',
+    icon: CodeBracketIcon,
   },
   {
     title: 'Activity Transparency',
     desc: 'Complete activity stream for fair academic evaluation and supervision.',
-    icon: 'i-heroicons-eye',
+    icon: EyeIcon,
   },
 ]
 
@@ -148,22 +177,22 @@ const steps = [
   { 
     title: 'Create Project Idea', 
     desc: 'Submit your graduation project concept and let AI analyze required skills.', 
-    icon: 'i-heroicons-light-bulb' 
+    icon: LightBulbIcon,
   },
   { 
     title: 'Build Your Team', 
     desc: 'AI matches you with students who have complementary technical skills.', 
-    icon: 'i-heroicons-user-group' 
+    icon: UserGroupIcon,
   },
   { 
     title: 'Collaborate & Build', 
     desc: 'Work together using integrated tools: Kanban, diagrams, chat, and video calls.', 
-    icon: 'i-heroicons-wrench-screwdriver' 
+    icon: WrenchScrewdriverIcon,
   },
   { 
     title: 'Auto Document', 
     desc: 'Let AI generate your final academic report from all project activities.', 
-    icon: 'i-heroicons-document-text' 
+    icon: DocumentTextIcon,
   },
 ]
 
@@ -191,7 +220,7 @@ const scrollToSection = (id: string) => {
       <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="h-9 w-9 rounded-xl bg-brand-purple flex items-center justify-center shadow-lg shadow-brand-purple/25">
-            <UIcon name="i-heroicons-bolt" class="h-5 w-5 text-white" />
+            <BoltIcon class="h-5 w-5 text-white" />
           </div>
           <span class="text-lg font-bold text-white tracking-tight">DevPulse</span>
         </div>
@@ -261,13 +290,13 @@ const scrollToSection = (id: string) => {
                   @click="showAccountModal = true"
                 >
                   <span>Start Your Project</span>
-                  <UIcon name="i-heroicons-arrow-right" class="h-5 w-5" />
+                  <ArrowRightIcon class="h-5 w-5" />
                 </button>
                 <button 
                   class="px-8 py-4 rounded-xl border border-border-slate text-slate-300 hover:text-white hover:border-brand-purple/50 transition-all flex items-center gap-2"
                   @click="scrollToSection('features')"
                 >
-                  <UIcon name="i-heroicons-play-circle" class="h-5 w-5" />
+                  <PlayCircleIcon class="h-5 w-5" />
                   <span>Explore Features</span>
                 </button>
               </div>
@@ -283,7 +312,7 @@ const scrollToSection = (id: string) => {
                   </div>
                   <div class="flex-1 mx-4">
                     <div class="h-7 bg-input-bg rounded-lg flex items-center px-3 text-xs text-slate-500">
-                      <UIcon name="i-heroicons-lock-closed" class="h-3 w-3 mr-2" />
+                      <LockClosedIcon class="h-3 w-3 mr-2" />
                       devpulse.app/dashboard
                     </div>
                   </div>
@@ -294,7 +323,7 @@ const scrollToSection = (id: string) => {
                     <div class="bg-brand-dark rounded-xl p-4 border border-border-dark">
                       <div class="flex items-center gap-2 mb-2">
                         <div class="h-8 w-8 rounded-lg bg-brand-purple/10 flex items-center justify-center">
-                          <UIcon name="i-heroicons-folder" class="h-4 w-4 text-brand-purple" />
+                          <FolderIcon class="h-4 w-4 text-brand-purple" />
                         </div>
                         <span class="text-xs text-slate-400">Projects</span>
                       </div>
@@ -304,7 +333,7 @@ const scrollToSection = (id: string) => {
                     <div class="bg-brand-dark rounded-xl p-4 border border-border-dark">
                       <div class="flex items-center gap-2 mb-2">
                         <div class="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                          <UIcon name="i-heroicons-check-circle" class="h-4 w-4 text-emerald-400" />
+                          <CheckCircleIcon class="h-4 w-4 text-emerald-400" />
                         </div>
                         <span class="text-xs text-slate-400">Tasks Done</span>
                       </div>
@@ -314,7 +343,7 @@ const scrollToSection = (id: string) => {
                     <div class="bg-brand-dark rounded-xl p-4 border border-border-dark">
                       <div class="flex items-center gap-2 mb-2">
                         <div class="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <UIcon name="i-heroicons-users" class="h-4 w-4 text-blue-400" />
+                          <UsersIcon class="h-4 w-4 text-blue-400" />
                         </div>
                         <span class="text-xs text-slate-400">Team</span>
                       </div>
@@ -357,7 +386,7 @@ const scrollToSection = (id: string) => {
                         <div class="text-xs text-slate-500 font-medium mb-2">Done</div>
                         <div class="bg-panel-dark rounded-lg p-3 border border-emerald-500/20">
                           <div class="flex items-center gap-1 mb-2">
-                            <UIcon name="i-heroicons-check" class="h-3 w-3 text-emerald-400" />
+                            <CheckIcon class="h-3 w-3 text-emerald-400" />
                             <div class="h-2 w-2/3 bg-emerald-500/40 rounded"/>
                           </div>
                           <div class="h-2 w-1/2 bg-slate-700 rounded"/>
@@ -371,7 +400,7 @@ const scrollToSection = (id: string) => {
               <div class="absolute -top-6 -right-6 bg-panel-dark border border-border-dark rounded-xl p-3 shadow-xl animate-bounce" style="animation-duration: 3s;">
                 <div class="flex items-center gap-2">
                   <div class="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                    <UIcon name="i-heroicons-sparkles" class="h-4 w-4 text-emerald-400" />
+                    <SparklesIcon class="h-4 w-4 text-emerald-400" />
                   </div>
                   <div>
                     <div class="text-xs font-semibold text-white">Kanban Board</div>
@@ -383,7 +412,7 @@ const scrollToSection = (id: string) => {
               <div class="absolute -bottom-8 -left-4 bg-panel-dark border border-border-dark rounded-xl p-3 shadow-xl" style="animation: bounce 4s infinite;">
                 <div class="flex items-center gap-2">
                   <div class="h-8 w-8 rounded-lg bg-brand-purple/10 flex items-center justify-center">
-                    <UIcon name="i-heroicons-user-plus" class="h-4 w-4 text-brand-purple" />
+                    <UserPlusIcon class="h-4 w-4 text-brand-purple" />
                   </div>
                   <div>
                     <div class="text-xs font-semibold text-white">New Member</div>
@@ -415,7 +444,7 @@ const scrollToSection = (id: string) => {
         <div class="max-w-7xl mx-auto px-6">
           <div class="text-center mb-16">
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-purple/10 border border-brand-purple/20 text-brand-purple text-xs font-medium mb-4">
-              <UIcon name="i-heroicons-cube" class="h-4 w-4" />
+              <CubeIcon class="h-4 w-4" />
               Platform Features
             </div>
             <h2 class="text-4xl font-extrabold text-white mb-4">
@@ -438,7 +467,7 @@ const scrollToSection = (id: string) => {
               
               <div class="relative">
                 <div class="h-12 w-12 rounded-xl bg-brand-purple/10 border border-brand-purple/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <UIcon :name="f.icon" class="h-6 w-6 text-brand-purple" />
+                  <component :is="f.icon" class="h-6 w-6 text-brand-purple" />
                 </div>
                 
                 <h3 class="text-lg font-bold text-white mb-2">{{ f.title }}</h3>
@@ -459,7 +488,7 @@ const scrollToSection = (id: string) => {
         <div class="relative max-w-7xl mx-auto px-6">
           <div class="text-center mb-16">
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-purple/10 border border-brand-purple/20 text-brand-purple text-xs font-medium mb-4">
-              <UIcon name="i-heroicons-map" class="h-4 w-4" />
+              <MapIcon class="h-4 w-4" />
               Process
             </div>
             <h2 class="text-4xl font-extrabold text-white mb-4">
@@ -481,7 +510,7 @@ const scrollToSection = (id: string) => {
               <div class="relative bg-panel-dark border border-border-dark rounded-2xl p-6 hover:border-brand-purple/30 transition-all duration-300 group">
                 <div class="flex items-center justify-between mb-4">
                   <div class="h-12 w-12 rounded-xl bg-brand-purple/10 border border-brand-purple/20 flex items-center justify-center group-hover:bg-brand-purple group-hover:border-brand-purple transition-all">
-                    <UIcon :name="s.icon" class="h-6 w-6 text-brand-purple group-hover:text-white transition-colors" />
+                    <component :is="s.icon" class="h-6 w-6 text-brand-purple group-hover:text-white transition-colors" />
                   </div>
                   <div class="h-8 w-8 rounded-full bg-brand-dark border border-border-dark flex items-center justify-center text-xs font-bold text-brand-purple">
                     {{ idx + 1 }}
@@ -515,13 +544,13 @@ const scrollToSection = (id: string) => {
               class="bg-brand-purple hover:bg-brand-purple-hover active:bg-brand-purple-active text-white font-semibold px-10 py-4 rounded-xl transition-all shadow-xl shadow-brand-purple/25 flex items-center gap-2"
               @click="showAccountModal = true"
             >
-              <UIcon name="i-heroicons-rocket-launch" class="h-5 w-5" />
+              <RocketLaunchIcon class="h-5 w-5" />
               <span>Get Started Free</span>
             </button>
             <button 
               class="px-10 py-4 rounded-xl border border-border-slate text-slate-300 hover:text-white hover:border-brand-purple/50 transition-all flex items-center gap-2"
             >
-              <UIcon name="i-heroicons-book-open" class="h-5 w-5" />
+              <BookOpenIcon class="h-5 w-5" />
               <span>View Documentation</span>
             </button>
           </div>
@@ -534,7 +563,7 @@ const scrollToSection = (id: string) => {
             <div class="md:col-span-2">
               <div class="flex items-center gap-3 mb-4">
                 <div class="h-10 w-10 rounded-xl bg-brand-purple flex items-center justify-center">
-                  <UIcon name="i-heroicons-bolt" class="h-5 w-5 text-white" />
+                  <BoltIcon class="h-5 w-5 text-white" />
                 </div>
                 <span class="text-xl font-bold text-white">DevPulse</span>
               </div>
@@ -544,10 +573,10 @@ const scrollToSection = (id: string) => {
               </p>
               <div class="flex gap-3">
                 <div class="h-10 w-10 rounded-lg bg-panel-dark border border-border-dark flex items-center justify-center hover:border-brand-purple/50 transition-colors cursor-pointer">
-                  <UIcon name="i-heroicons-globe-alt" class="h-5 w-5 text-slate-400" />
+                  <GlobeAltIcon class="h-5 w-5 text-slate-400" />
                 </div>
                 <div class="h-10 w-10 rounded-lg bg-panel-dark border border-border-dark flex items-center justify-center hover:border-brand-purple/50 transition-colors cursor-pointer">
-                  <UIcon name="i-heroicons-envelope" class="h-5 w-5 text-slate-400" />
+                  <EnvelopeIcon class="h-5 w-5 text-slate-400" />
                 </div>
               </div>
             </div>
@@ -606,10 +635,7 @@ const scrollToSection = (id: string) => {
           >
             <div class="flex items-start gap-4">
               <div class="hidden h-12 mt-2 w-12 rounded-xl bg-brand-purple/10 border border-brand-purple/20 sm:flex items-center justify-center group-hover:bg-brand-purple group-hover:border-brand-purple transition-all">
-                <UIcon
-                  :name="acc.icon"
-                  class="w-10 h-8 text-brand-purple group-hover:text-white transition-colors"
-                />
+                <component :is="acc.icon" class="w-10 h-8 text-brand-purple group-hover:text-white transition-colors" />
               </div>
 
               <div>

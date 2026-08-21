@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { UserProfile } from '~/types/auth'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 definePageMeta({
   layout: 'blank',
@@ -14,7 +15,6 @@ const errorMessage = ref('')
 
 const processAuthCallback = async () => {
   try {
-    // ✅ استخدم URLSearchParams مباشرة بدل route.query
     const urlParams = new URLSearchParams(window.location.search)
     
     const token = urlParams.get('token') || (route.query.token as string | undefined)
@@ -22,17 +22,11 @@ const processAuthCallback = async () => {
     const role = urlParams.get('role') || (route.query.role as string | undefined)
     const profileCompletedRaw = urlParams.get('profile_completed') || (route.query.profile_completed as string | undefined)
     
-    // Debug
-    console.log('🔍 Callback Debug:', {
-      token: token ? 'exists' : 'missing',
-      userJson: userJson ? 'exists' : 'missing',
-      role,
-      profileCompletedRaw,
-      fullUrl: window.location.href,
-    })
+  
 
     if (!token || !userJson) {
       errorMessage.value = 'Invalid authentication response. Missing required data.'
+      
       return
     }
 
@@ -96,7 +90,7 @@ onMounted(() => {
 
     <div v-else-if="errorMessage" class="w-full max-w-md text-center space-y-6 p-8 rounded-xl border border-border-dark bg-brand-dark">
       <div class="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto">
-        <UIcon name="i-heroicons-x-mark" class="h-6 w-6 text-rose-500" />
+        <XMarkIcon class="h-6 w-6 text-rose-500" />
       </div>
       <div class="space-y-2">
         <h3 class="text-lg font-bold text-white">
