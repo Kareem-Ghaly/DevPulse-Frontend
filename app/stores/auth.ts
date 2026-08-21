@@ -12,12 +12,20 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = authData.token
     role.value = authData.role || null
     user.value = authData.user
+    
+    if (import.meta.client) {
+      localStorage.setItem('devpulse_vault_token', authData.token)
+    }
   }
 
   const logout = async () => {
     token.value = null
     user.value = null
     role.value = null
+    
+    if (import.meta.client) {
+      localStorage.removeItem('devpulse_vault_token')
+    }
   }
 
   return {
