@@ -4,6 +4,17 @@ import { getMessaging } from 'firebase/messaging'
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
 
+  // ✅ إذا مافيش projectId، ما تشغلش Firebase
+  if (!config.public.firebaseProjectId) {
+    console.warn('[Firebase] Not configured - skipping initialization')
+    return {
+      provide: {
+        firebaseApp: null,
+        firebaseMessaging: null,
+      }
+    }
+  }
+
   const firebaseConfig = {
     apiKey: config.public.firebaseApiKey,
     authDomain: config.public.firebaseAuthDomain,
@@ -13,13 +24,23 @@ export default defineNuxtPlugin(() => {
     appId: config.public.firebaseAppId,
   }
 
-  const app = initializeApp(firebaseConfig)
-  const messaging = getMessaging(app)
+  try {
+    const app = initializeApp(firebaseConfig)
+    const messaging = getMessaging(app)
 
-  return {
-    provide: {
-      firebaseApp: app,
-      firebaseMessaging: messaging,
+    return {
+      provide: {
+        firebaseApp: app,
+        firebaseMessaging: messaging,
+      }
+    }
+  } catch (err) {
+    console.error('[Firebase] Initialization failed:', err)
+    return {
+      provide: {
+        firebaseApp: null,
+        firebaseMessaging: null,
+      }
     }
   }
 })

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+	<script setup lang="ts">
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useMutation } from '@tanstack/vue-query'
@@ -74,9 +74,9 @@ const handleGoogleLogin = async () => {
   isGoogleLoading.value = true
   try {
     const response = await authService.getGoogleRedirect(selectedRole.value)
-    if (response && response.status && response.data.redirect_url) {
-      window.location.href = response.data.redirect_url
-    }
+	if (import.meta.client) {
+  window.location.href = response.data.redirect_url
+}
   }
   catch (error) {
     console.error(error)

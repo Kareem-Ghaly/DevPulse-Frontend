@@ -300,7 +300,33 @@ const uiSelectStyle = {
                 </select>
               </div>
             </div>
-
+<div class="space-y-1.5">
+  <label class="block text-xs font-bold text-slate-300">Department</label>
+  <select
+    v-model="department"
+    v-bind="departmentAttrs"
+    :class="uiSelectStyle.base"
+  >
+    <option value="" disabled>Select your department</option>
+    <option value="Software Engineering">Software Engineering</option>
+    <option value="Computer Science Engineering">Computer Science Engineering</option>
+    <option value="Information Technology">Information Technology</option>
+    <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+    <option value="Data Science">Data Science</option>
+    <option value="Cybersecurity">Cybersecurity</option>
+    <option value="Cloud Computing">Cloud Computing</option>
+    <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
+    <option value="Robotics">Robotics</option>
+    <option value="Game Development">Game Development</option>
+    <option value="Computer Networks">Computer Networks</option>
+    <option value="Computer Engineering">Computer Engineering</option>
+    <option value="Information Engineering">Information Engineering</option>
+    <option value="Human-Computer Interaction">Human-Computer Interaction</option>
+    <option value="Computer Graphics">Computer Graphics</option>
+    <option value="Database Systems">Database Systems</option>
+  </select>
+  <span v-if="errors.department" class="text-xs text-rose-500 block mt-1">{{ errors.department }}</span>
+</div>
             <div class="space-y-1.5">
               <label class="block text-xs font-bold text-slate-300">Department</label>
               <UInput

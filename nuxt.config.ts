@@ -71,7 +71,8 @@ export default defineNuxtConfig({
     },
     prerender: {
       crawlLinks: true,
-      routes: ['/']
+      routes: ['/'],
+      ignore: ['/auth/callback']
     }
   },
 

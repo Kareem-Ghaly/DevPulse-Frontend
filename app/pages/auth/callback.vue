@@ -14,14 +14,25 @@ const errorMessage = ref('')
 
 const processAuthCallback = async () => {
   try {
-    const token = route.query.token as string | undefined
-    const userJson = route.query.user as string | undefined
-    const role = route.query.role as string | undefined
-    const profileCompletedRaw = route.query.profile_completed as string | undefined
+    // ✅ استخدم URLSearchParams مباشرة بدل route.query
+    const urlParams = new URLSearchParams(window.location.search)
+    
+    const token = urlParams.get('token') || (route.query.token as string | undefined)
+    const userJson = urlParams.get('user') || (route.query.user as string | undefined)
+    const role = urlParams.get('role') || (route.query.role as string | undefined)
+    const profileCompletedRaw = urlParams.get('profile_completed') || (route.query.profile_completed as string | undefined)
+    
+    // Debug
+    console.log('🔍 Callback Debug:', {
+      token: token ? 'exists' : 'missing',
+      userJson: userJson ? 'exists' : 'missing',
+      role,
+      profileCompletedRaw,
+      fullUrl: window.location.href,
+    })
 
     if (!token || !userJson) {
       errorMessage.value = 'Invalid authentication response. Missing required data.'
-
       return
     }
 
@@ -29,9 +40,9 @@ const processAuthCallback = async () => {
     try {
       user = JSON.parse(decodeURIComponent(userJson)) as UserProfile
     }
-    catch {
+    catch (e) {
+      console.error('JSON Parse Error:', e)
       errorMessage.value = 'Failed to parse user data from authentication response.'
-      
       return
     }
 
