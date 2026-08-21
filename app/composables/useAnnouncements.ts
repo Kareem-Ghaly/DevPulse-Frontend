@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { Announcement, PaginationMeta, AnnouncementsResponse } from '~/types/announcement' // قم بتعديل المسار حسب مشروعك
+import type { Announcement, PaginationMeta, AnnouncementsResponse } from '~/types/announcement'
 
 export const useAnnouncements = () => {
   const api = useApiClient()

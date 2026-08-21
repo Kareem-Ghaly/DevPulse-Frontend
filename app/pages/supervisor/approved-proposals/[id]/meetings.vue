@@ -242,7 +242,6 @@ onMounted(() => {
           </div>
 
           <div class="flex items-center gap-2 pt-3 border-t border-border-dark">
-            <!-- ✅ زر الانضمام مع التحقق من الوقت -->
             <button
               v-if="meeting.meeting_link"
               :disabled="!canJoinMeeting(meeting)"

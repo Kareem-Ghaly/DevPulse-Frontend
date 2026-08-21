@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { useHead } from '#imports'
 
 export type Locale = 'ar' | 'en'
 
@@ -99,20 +100,23 @@ const messages = {
 }
 
 export function useI18n() {
+  useHead(() => ({
+    htmlAttrs: {
+      dir: dir.value,
+      lang: currentLocale.value,
+    }
+  }))
+
   const t = (key: keyof typeof messages.en) => {
     return messages[currentLocale.value][key] || key
   }
 
   const toggleLocale = () => {
     currentLocale.value = currentLocale.value === 'en' ? 'ar' : 'en'
-    document.documentElement.lang = currentLocale.value
-    document.documentElement.dir = dir.value
   }
 
   const setLocale = (locale: Locale) => {
     currentLocale.value = locale
-    document.documentElement.lang = locale
-    document.documentElement.dir = dir.value
   }
 
   return {

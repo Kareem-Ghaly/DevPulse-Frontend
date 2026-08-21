@@ -66,7 +66,7 @@ const formatDate = (dateStr: string | null): string => {
             </div>
 
             <NuxtLink
-              to="/profile/setup"
+              :to="user?.role === 'Supervisor' ? '/profile/supervisor/complete' : '/profile/setup'"
               class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-brand-purple hover:bg-brand-purple-hover text-white text-sm font-bold transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
             >
               <UIcon name="i-heroicons-pencil-square" class="h-4 w-4" />

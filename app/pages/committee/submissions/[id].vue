@@ -113,33 +113,6 @@ const uiInputStyle = {
       </div>
 
       <div v-else class="space-y-6">
-        <div
-          class="flex items-center justify-between p-4 rounded-xl border"
-          :class="singleSubmission.status === 'graded' ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-amber-500/5 border-amber-500/20'"
-        >
-          <div>
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Status</span>
-            <p
-              class="text-sm font-bold mt-1 capitalize"
-              :class="singleSubmission.status === 'graded' ? 'text-emerald-400' : 'text-amber-400'"
-            >
-              {{ singleSubmission.status }}
-            </p>
-          </div>
-          <div v-if="singleSubmission.total_grade">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Grade</span>
-            <p class="text-sm text-emerald-400 font-bold mt-1">
-              {{ singleSubmission.total_grade }}
-            </p>
-          </div>
-          <div>
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Submitted</span>
-            <p class="text-sm text-slate-300 mt-1">
-              {{ formatDate(singleSubmission.created_at) }}
-            </p>
-          </div>
-        </div>
-
         <div class="bg-panel-dark border border-border-dark rounded-xl p-5">
           <h2 class="text-sm font-bold text-white mb-4 uppercase tracking-widest">
             Submission Links

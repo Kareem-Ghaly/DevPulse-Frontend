@@ -24,7 +24,7 @@ const emit = defineEmits<{
         </div>
         <h2 class="font-bold text-white uppercase tracking-wider">Team Members</h2>
       </div>
-      <span class="text-slate-500">{{ team.members.length }} / {{ project.team_size }}</span>
+      <span class="text-slate-500">{{ (team.members.length || 1) }} / {{ project.team_size }}</span>
     </div>
 
     <div class="space-y-3">

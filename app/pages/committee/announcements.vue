@@ -51,12 +51,13 @@ const uiInputStyle = {
       </div>
 
       <form class="border border-border-dark bg-brand-dark p-8 rounded-xl shadow-xl space-y-5" @submit.prevent="onSubmit">
-        <div class="space-y-1.5">
+        <div class="space-y-1.5 w-full">
           <label class="block text-xs font-bold text-slate-300">Title</label>
           <UInput
             v-model="title"
             v-bind="titleAttrs"
             type="text"
+            class="w-full"
             placeholder="Enter announcement title..."
             :ui="uiInputStyle"
           />

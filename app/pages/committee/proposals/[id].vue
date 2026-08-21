@@ -266,12 +266,12 @@ const statusLabel = computed(() => {
           >
             Approve
           </button>
-          <button
+          <!-- <button
             class="flex-1 bg-amber-600 hover:bg-amber-500 text-white text-sm font-bold py-3 rounded-lg transition-colors cursor-pointer"
             @click="openDecision('needs_revision')"
           >
             Request Changes
-          </button>
+          </button> -->
           <button
             class="flex-1 bg-red-600 hover:bg-red-500 text-white text-sm font-bold py-3 rounded-lg transition-colors cursor-pointer"
             @click="openDecision('rejected')"

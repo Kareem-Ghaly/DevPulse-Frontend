@@ -8,7 +8,7 @@ const form = reactive({
   title: '',
   abstract: '',
   description: '',
-  team_size: 1,
+  team_size: 2,
   required_skills: [] as string[],
 })
 
@@ -257,7 +257,7 @@ const router = useRouter()
               <input
                 v-model.number="form.team_size"
                 type="number"
-                min="1"
+                min="2"
                 class="w-full bg-input-bg border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all"
                 :class="stepErrors.team_size ? 'border-red-500 focus:border-red-500' : 'border-input-border focus:border-brand-purple'"
               >

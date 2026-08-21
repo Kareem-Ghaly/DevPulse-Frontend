@@ -88,7 +88,6 @@ const handleLogout = () => {
                   :key="n.id"
                   class="p-3 border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors"
                   :class="{ 'bg-slate-800/20': !n.read_at }"
-                  @click="n.data?.action_url && navigateTo(n.data.action_url)"
                 >
                   <p class="text-xs font-semibold text-white">{{ n.data?.title || 'notice' }}</p>
                   <p class="text-[11px] text-slate-400 mt-0.5">{{ n.data?.body || '' }}</p>

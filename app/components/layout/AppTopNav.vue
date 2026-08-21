@@ -4,7 +4,7 @@ const sidebar = useSidebar()
 const isMobileMenuOpen = ref(false)
 
 const { removeToken, listenToMessages } = useFirebaseMessaging()
-const { notifications, unreadCount, fetchNotifications, markAllAsRead } = useNotifications()
+const { notifications, unreadCount, fetchNotifications, markAllAsRead, markAsRead } = useNotifications()
 const showNotifications = ref(false)
 
 
@@ -23,6 +23,32 @@ const closeMobileMenu = (): void => {
   isMobileMenuOpen.value = false
 }
 
+const handleNotificationClick = (actionUrl: string | undefined) => {
+  if (!actionUrl) return
+
+  if (actionUrl.includes('/my-invitations')) {
+    navigateTo('/invitations')
+    
+    return
+  }
+
+  const proposalMatch = actionUrl.match(/\/project-proposals\/(\d+)$/)
+  if (proposalMatch) {
+    navigateTo(`/student/project-work-space/${proposalMatch[1]}`)
+    
+    return
+  }
+
+  const taskMatch = actionUrl.match(/\/tasks\/(\d+)$/)
+  if (taskMatch) {
+    navigateTo(`/student/project-work-space/${taskMatch[1]}/proposal`)
+    
+    return
+  }
+
+  navigateTo(actionUrl)
+}
+
 onMounted(() => {
   listenToMessages()
   fetchNotifications()
@@ -34,7 +60,7 @@ onMounted(() => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center gap-3">
-          
+
 
           <NuxtLink to="/" class="flex items-center gap-2">
             <div class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-600/20">
@@ -66,7 +92,7 @@ onMounted(() => {
           >
             Announcements
           </NuxtLink>
-          
+
         </div>
 
         <div class="flex items-center gap-3">
@@ -99,21 +125,32 @@ onMounted(() => {
                  Make All As Read
                 </button>
               </div>
-              
+
               <div v-if="!notifications?.length" class="p-4 text-center text-xs text-slate-500">
                No Notifications
               </div>
-              
+
               <div
                 v-for="n in notifications"
                 :key="n.id"
-                class="p-3 border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors"
+                class="p-3 border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors group"
                 :class="{ 'bg-slate-800/20': !n.read_at }"
-                @click="n.data?.action_url && navigateTo(n.data.action_url)"
               >
-                <p class="text-xs font-semibold text-white">{{ n.data?.title || 'notice' }}</p>
-                <p class="text-[11px] text-slate-400 mt-0.5">{{ n.data?.body || '' }}</p>
-                <p class="text-[10px] text-slate-600 mt-1">{{ new Date(n.created_at).toLocaleDateString('ar-SA') }}</p>
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-white">{{ n.data?.title || 'notice' }}</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">{{ n.data?.body || '' }}</p>
+                    <p class="text-[10px] text-slate-600 mt-1">{{ new Date(n.created_at).toLocaleDateString('ar-SA') }}</p>
+                  </div>
+                  <button
+                    v-if="!n.read_at"
+                    class="shrink-0 p-1.5 rounded-md text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Mark as read"
+                    @click.stop="markAsRead(n.id)"
+                  >
+                    <UIcon name="i-heroicons-check" class="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
