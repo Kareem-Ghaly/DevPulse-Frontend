@@ -2,18 +2,25 @@ import { defineStore } from 'pinia'
 import type { UserProfile } from '~/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
-  const cookieOptions = {
-    maxAge: 60 * 60 * 24 * 7,
-    path: '/',
-    secure: true,
-    sameSite: 'lax' as const,
-    httpOnly: false,
-  }
-
-  const token = useCookie<string | undefined>('devpulse_vault_token', cookieOptions)
-  
+  const token = ref<string | undefined>(undefined)
   const user = useState<UserProfile | null>('auth_user', () => null)
   const role = useState<string | null>('auth_role', () => null)
+
+  if (import.meta.client) {
+    const cookieToken = useCookie<string | undefined>('devpulse_vault_token', {
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      secure: true,
+      sameSite: 'lax',
+      httpOnly: false,
+    })
+
+    token.value = cookieToken.value
+
+    watch(token, (newVal) => {
+      cookieToken.value = newVal
+    })
+  }
 
   const isAuthenticated = computed(() => !!token.value)
 
