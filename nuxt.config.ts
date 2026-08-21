@@ -69,7 +69,6 @@ export default defineNuxtConfig({
         changeOrigin: true,
       },
     },
-    preset: 'cloudflare-pages',
     prerender: {
       crawlLinks: true,
       routes: ['/']
