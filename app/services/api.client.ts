@@ -2,7 +2,7 @@ export const useApiClient = () => {
   const authStore = useAuthStore()
   const appToast = useAppToast()
   const config = useRuntimeConfig()
-  const BASE_URL = 'http://127.0.0.1:8000/api';
+  const BASE_URL = 'https://devpluse-app.online/api';
 
   const request = async <T>(endpoint: string, options: Parameters<typeof $fetch>[1] = {}): Promise<T> => {
     const activeToken = authStore.token

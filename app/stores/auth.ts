@@ -2,9 +2,14 @@ import { defineStore } from 'pinia'
 import type { UserProfile } from '~/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
+  const config = useRuntimeConfig()
+
   const cookieOptions = {
     maxAge: 60 * 60 * 24 * 7,
-    path: '/'
+    path: '/',
+    secure: process.env.NODE_ENV === 'production' || window?.location?.protocol === 'https:',
+    sameSite: 'lax' as const,
+    httpOnly: false,
   }
 
   const token = useCookie<string | null>('devpulse_vault_token', cookieOptions)

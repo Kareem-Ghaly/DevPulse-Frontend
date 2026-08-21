@@ -13,7 +13,7 @@ const emit = defineEmits<{
 
 <template>
   <button
-    class="flex items-center gap-1.5 px-4 mt-5 mb-2 w-full py-2 rounded-lg text-xs font-medium transition-all flex-1 justify-center"
+    class="flex items-center justify-center gap-1.5 px-6 py-2 rounded-lg text-xs font-medium transition-all mt-3"
     :class="
       isInvited
         ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 cursor-default'

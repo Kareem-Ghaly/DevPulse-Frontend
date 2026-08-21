@@ -48,7 +48,7 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
         wssPort: 8080,
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
-        authEndpoint: `${config.public.apiBase}/broadcasting/auth`,
+        authEndpoint: `https://devpluse-app.online/api/broadcasting/auth`,
         auth: {
           headers: {
             Authorization: authToken,
