@@ -20,6 +20,10 @@ declare global {
 export function useProposalWebSocket(projectTeamId: ComputedRef<number | null>) {
   const queryClient = useQueryClient()
   
+
+  queryClient.invalidateQueries({ queryKey: ['projects'] })
+  queryClient.invalidateQueries({ queryKey: ['project-detail'] })
+  queryClient.invalidateQueries({ queryKey: ['team'] })  
   const proposal = ref<ProjectProposal | null>(null)
   const isConnected = ref(false)
   const isCollaborating = ref(false)

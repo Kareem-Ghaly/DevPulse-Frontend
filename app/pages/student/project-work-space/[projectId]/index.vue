@@ -8,6 +8,11 @@ import { useTeamData } from '~/composables/useTeam/useTeamData.js'
 const route = useRoute()
 const router = useRouter()
 
+definePageMeta({
+  layout: 'blank',
+  ssr: false,
+})
+
 const projectId = computed(() => Number(route.params.projectId))
 
 const { project, isLoadingProject } = useProjectDetail(projectId)
