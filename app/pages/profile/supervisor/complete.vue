@@ -33,7 +33,7 @@ const { data: userData, error: authError } = useQuery({
     const token = authStore.token
     if (!token) throw new Error('No token found')
 
-    return await $fetch(`https://devpluse-app.online/api/auth/me`, {
+    return await $fetch(`http://127.0.0.1:8000/api/auth/me`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -164,7 +164,7 @@ const { mutate: updateProfile, isPending: isLoading } = useMutation({
   mutationFn: async (payload: SupervisorProfileForm) => {
     const token = authStore.token
 
-    return await $fetch(`https://devpluse-app.online/api/profile/supervisor/complete`, {
+    return await $fetch(`http://127.0.0.1:8000/api/profile/supervisor/complete`, {
       method: 'PUT',
       body: payload,
       headers: {

@@ -37,26 +37,17 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
     }
 
     try {
-      const authToken = token.startsWith('Bearer ')
-        ? token
-        : `Bearer ${token}`
+      const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`
 
       const instance = new Echo({
         broadcaster: 'reverb',
-
         key: 'vpctovzoey05irudhxyr',
-
-        wsHost: 'devpluse-app.online',
-        wsPort: 80,
-        wssPort: 443,
-
-        forceTLS: true,
-
-        enabledTransports: ['wss'],
-
-        authEndpoint:
-          'https://devpluse-app.online/api/broadcasting/auth',
-
+        wsHost: '127.0.0.1',
+        wsPort: 8080,
+        wssPort: 8080,
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+        authEndpoint: 'http://127.0.0.1:8000/api/broadcasting/auth',
         auth: {
           headers: {
             Authorization: authToken,
@@ -69,10 +60,9 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
       window.__ECHO_INSTANCE__ = instance
 
       return instance
-    } catch (error) {
-      console.error('Echo initialization failed:', error)
 
-      window.__ECHO_INSTANCE__ = null
+    } catch (error) {
+      console.error('Echo init failed:', error)
 
       return null
     }
@@ -83,35 +73,26 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
       const authStore = useAuthStore()
 
       return authStore.token || null
-    } catch (error) {
-      console.error('Unable to get authentication token:', error)
-
+    } catch (e) {
       return null
     }
   }
 
   const token = getToken()
-
   if (token) {
     initEcho(token)
   }
 
   let attempts = 0
-
-  const interval = window.setInterval(() => {
+  const interval = setInterval(() => {
     attempts++
-
     if (window.__ECHO_INSTANCE__ || attempts > 20) {
-      window.clearInterval(interval)
+      clearInterval(interval)
 
       return
     }
-
     const retryToken = getToken()
-
-    if (retryToken) {
-      initEcho(retryToken)
-    }
+    if (retryToken) initEcho(retryToken)
   }, 500)
 
   return {
