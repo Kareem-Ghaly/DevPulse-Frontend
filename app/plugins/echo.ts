@@ -16,7 +16,6 @@ interface EchoPluginReturn {
 }
 
 export default defineNuxtPlugin((): EchoPluginReturn => {
-  const config = useRuntimeConfig();
   if (typeof window === 'undefined') {
     return {
       provide: {
@@ -38,17 +37,26 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
     }
 
     try {
-      const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`
+      const authToken = token.startsWith('Bearer ')
+        ? token
+        : `Bearer ${token}`
 
       const instance = new Echo({
         broadcaster: 'reverb',
+
         key: 'vpctovzoey05irudhxyr',
-        wsHost: '127.0.0.1',
-        wsPort: 8080,
-        wssPort: 8080,
-        forceTLS: false,
-        enabledTransports: ['ws', 'wss'],
-        authEndpoint: `https://devpluse-app.online/api/broadcasting/auth`,
+
+        wsHost: 'devpluse-app.online',
+        wsPort: 80,
+        wssPort: 443,
+
+        forceTLS: true,
+
+        enabledTransports: ['wss'],
+
+        authEndpoint:
+          'https://devpluse-app.online/api/broadcasting/auth',
+
         auth: {
           headers: {
             Authorization: authToken,
@@ -61,9 +69,10 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
       window.__ECHO_INSTANCE__ = instance
 
       return instance
-
     } catch (error) {
-      console.error('Echo init failed:', error)
+      console.error('Echo initialization failed:', error)
+
+      window.__ECHO_INSTANCE__ = null
 
       return null
     }
@@ -74,26 +83,35 @@ export default defineNuxtPlugin((): EchoPluginReturn => {
       const authStore = useAuthStore()
 
       return authStore.token || null
-    } catch (e) {
+    } catch (error) {
+      console.error('Unable to get authentication token:', error)
+
       return null
     }
   }
 
   const token = getToken()
+
   if (token) {
     initEcho(token)
   }
 
   let attempts = 0
-  const interval = setInterval(() => {
+
+  const interval = window.setInterval(() => {
     attempts++
+
     if (window.__ECHO_INSTANCE__ || attempts > 20) {
-      clearInterval(interval)
+      window.clearInterval(interval)
 
       return
     }
+
     const retryToken = getToken()
-    if (retryToken) initEcho(retryToken)
+
+    if (retryToken) {
+      initEcho(retryToken)
+    }
   }, 500)
 
   return {
