@@ -15,6 +15,9 @@ export const useAuthStore = defineStore('auth', () => {
     
     if (import.meta.client) {
       localStorage.setItem('devpulse_vault_token', authData.token)
+      localStorage.setItem('user_id', authData.user.id)
+      localStorage.setItem('email', authData.user.email)
+      localStorage.setItem('role', authData.user.role)
     }
   }
 
@@ -25,6 +28,9 @@ export const useAuthStore = defineStore('auth', () => {
     
     if (import.meta.client) {
       localStorage.removeItem('devpulse_vault_token')
+      localStorage.removeItem('user_id')
+      localStorage.removeItem('email')
+      localStorage.removeItem('role')
     }
   }
 

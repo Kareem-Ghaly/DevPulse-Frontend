@@ -6,8 +6,8 @@ export default defineNuxtRouteMiddleware((to) => {
     '/auth/login',
     '/auth/register',
     '/auth/forgot-password',
-    '/auth/callback',        // ✅ أضف هذا
-    '/auth/admin/login',     // ✅ وأضف هذا كمان
+    '/auth/callback',
+    '/auth/admin/login',
   ]
 
   const token = import.meta.client ? localStorage.getItem('devpulse_vault_token') : null

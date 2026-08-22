@@ -7,7 +7,10 @@ const { removeToken, listenToMessages } = useFirebaseMessaging()
 const { notifications, unreadCount, fetchNotifications, markAllAsRead, markAsRead } = useNotifications()
 const showNotifications = ref(false)
 
-
+const userEmail = ref('')
+if (typeof window !== 'undefined') {
+  userEmail.value = localStorage.getItem('email');
+}
 
 const handleLogout = async (): Promise<void> => {
   await removeToken()
@@ -21,32 +24,6 @@ const toggleMobileMenu = (): void => {
 
 const closeMobileMenu = (): void => {
   isMobileMenuOpen.value = false
-}
-
-const handleNotificationClick = (actionUrl: string | undefined) => {
-  if (!actionUrl) return
-
-  if (actionUrl.includes('/my-invitations')) {
-    navigateTo('/invitations')
-    
-    return
-  }
-
-  const proposalMatch = actionUrl.match(/\/project-proposals\/(\d+)$/)
-  if (proposalMatch) {
-    navigateTo(`/student/project-work-space/${proposalMatch[1]}`)
-    
-    return
-  }
-
-  const taskMatch = actionUrl.match(/\/tasks\/(\d+)$/)
-  if (taskMatch) {
-    navigateTo(`/student/project-work-space/${taskMatch[1]}/proposal`)
-    
-    return
-  }
-
-  navigateTo(actionUrl)
 }
 
 onMounted(() => {
@@ -162,7 +139,7 @@ onMounted(() => {
             <div class="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
               {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
-            <span class="text-sm font-medium text-slate-300 hidden sm:block">{{ authStore.user?.name || 'User' }}</span>
+            <span class="text-sm font-medium text-slate-300 hidden sm:block">{{ userEmail }}</span>
           </NuxtLink>
 
           <button

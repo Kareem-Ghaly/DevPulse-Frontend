@@ -16,7 +16,9 @@ const appToast = useAppToast()
 const queryClient = useQueryClient()
 const api = useApiClient()
 
-const isOwner = computed(() => authStore.user?.id === props.ownerId)
+const isOwner = computed(() => localStorage.getItem('user_id') == props.ownerId)
+
+console.log(props.ownerId)
 
 const { mutate: deleteProject, isPending: isDeleting } = useMutation({
   mutationFn: async () => {
